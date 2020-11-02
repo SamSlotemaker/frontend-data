@@ -8,12 +8,8 @@ export function createBarChart(array, x, y) {
     const svg = d3.select('#svg-container')
         .append("svg").attr("width", containerWidth - 100).attr("height", containerHeight - 100);
     //grootte van svg
-    const width = +svg.attr('width')
-    const height = +svg.attr('height')
-
-    //callback functions die loopen over de waardes
-    const xValue = d => d[x]
-    const yValue = d => d[y]
+    const width = svg.attr('width')
+    const height = svg.attr('height')
 
     const margin = {
         top: 0,
@@ -26,15 +22,19 @@ export function createBarChart(array, x, y) {
     const innerWidth = width - margin.left - margin.right
     const innerHeight = height - margin.top - margin.bottom
 
+    //callback functions die loopen over de waardes
+    const yValue = d => d[x]
+    const xValue = d => d[y]
+
     //render de chart
     const renderBarChart = data => {
         //maak schaal aan voor assen
-        const xScale = d3.scaleLinear()
-            .domain([0, d3.max(data, xValue)])
-            .range([0, innerWidth])
-        const yScale = d3.scaleBand()
-            .domain(data.map(yValue))
+        const yScale = d3.scaleLinear()
+            .domain([0, d3.max(data, yValue)])
             .range([0, innerHeight])
+        const xScale = d3.scaleBand()
+            .domain(data.map(xValue))
+            .range([0, innerWidth])
             .padding(0.1)
 
         //creeer groep voor grafiek
@@ -49,9 +49,10 @@ export function createBarChart(array, x, y) {
         //selecteer alle rectangles in parent element 'g'
         g.selectAll('rect').data(data)
             .enter().append('rect') //voeg rectangles toe wanneer deze niet bestaan
-            .attr('y', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
-            .attr('width', d => xScale(xValue(d))) // width wordt geset voor ieder item
-            .attr('height', yScale.bandwidth()) //height wordt betpaald en geset voor ieder item
+            .attr('x', d => xScale(xValue(d))) //y attribute wordt geset voor ieter item
+            .attr("y", d => innerHeight - yScale(yValue(d)))
+            .attr('height', d => yScale(yValue(d))) // width wordt geset voor ieder item
+            .attr('width', xScale.bandwidth()) //height wordt betpaald en geset voor ieder item
 
     }
     renderBarChart(array)
