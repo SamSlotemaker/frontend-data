@@ -23,14 +23,14 @@ export function createBarChart(array, x, y) {
     const innerHeight = height - margin.top - margin.bottom
 
     //callback functions die loopen over de waardes
-    const yValue = d => d[x]
-    const xValue = d => d[y]
+    const yValue = d => d[y]
+    const xValue = d => d[x]
 
     //render de chart
     const renderBarChart = data => {
         //maak schaal aan voor assen
         const yScale = d3.scaleLinear()
-            .domain([0, d3.max(data, yValue)])
+            .domain([d3.max(data, yValue), 0])
             .range([0, innerHeight])
         const xScale = d3.scaleBand()
             .domain(data.map(xValue))
@@ -50,8 +50,9 @@ export function createBarChart(array, x, y) {
         g.selectAll('rect').data(data)
             .enter().append('rect') //voeg rectangles toe wanneer deze niet bestaan
             .attr('x', d => xScale(xValue(d))) //y attribute wordt geset voor ieter item
-            .attr("y", d => innerHeight - yScale(yValue(d)))
-            .attr('height', d => yScale(yValue(d))) // width wordt geset voor ieder item
+            // width wordt geset voor ieder item
+            .attr("y", d => yScale(yValue(d)))
+            .attr('height', d => innerHeight - yScale(yValue(d)))
             .attr('width', xScale.bandwidth()) //height wordt betpaald en geset voor ieder item
 
     }

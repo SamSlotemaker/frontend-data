@@ -72,9 +72,9 @@ allPromises.then(data => {
         function ceateChartAantal(e) {
             removeSVG() //verwijder vorige grafiek wanneer deze bestond
             if (e.target.textContent == 'Aantal') {
-                d3Charts.createBarChart(countedYearsSorted, 'aantal', 'jaar')
+                d3Charts.createBarChart(countedYearsSorted, 'jaar', 'aantal')
             } else {
-                d3Charts.createBarChart(countedYearsSortedByYears, 'aantal', 'jaar')
+                d3Charts.createBarChart(countedYearsSortedByYears, 'jaar', 'aantal')
             }
         }
         //kies sorteer optie doormiddel van knoppen
