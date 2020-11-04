@@ -19,7 +19,7 @@
      //vol object counter met default value 0 voor elk jaar
      allItems.forEach(item => {
          counter.push({
-             "jaar": item,
+             "id": item,
              "aantal": 0
          })
      })

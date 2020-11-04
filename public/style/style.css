@@ -52,6 +52,12 @@ body {
     background-color: lightblue;
 }
 
+/* ticks */
+.tick line {
+    /* color: white; */
+    stroke: rgb(71, 71, 71)
+}
+
 rect {
     fill: lightblue;
 }
@@ -65,8 +71,21 @@ rect:hover {
 
 }
 
+/* title */
+svg>g>text {
+    fill: orangered;
+    font-size: 2em;
+}
+
+.axis-label {
+    fill: orangered;
+    font-size: 1.6em;
+    text-transform: uppercase;
+}
+
 text {
     font-size: 1.4em;
     font-weight: bold;
     color: white;
+    fill: white;
 }
