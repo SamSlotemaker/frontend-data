@@ -1,7 +1,8 @@
 import * as arrayManipulations from './modules/arrayManipulations.js'
 import * as calculations from './modules/calculations.js'
 import * as cleanData from './modules/cleanData.js'
-import * as d3Charts from './modules/d3charts.js'
+import * as barChart from './modules/d3/barChart.js'
+import * as scatterPlot from './modules/d3/scatterPlot.js'
 import * as reverseGeo from './modules/reverseGeo.js'
 import {
     batchData
@@ -56,40 +57,83 @@ allPromises.then(data => {
 
     //refactor date strings to objects
     const refactoredSellingPointDates = cleanData.refactorDates(sellingPointDate)
-    //haal alle jaren op 
+
+    //refactor dates to JS date objects and filter empty dates
+    const sellingPointDatesFormattedAmerican = refactoredSellingPointDates.map(date => {
+        if (date != -1) {
+            const factoredDate = `${date.year}-${date.month}-${date.day}`
+            return new Date(factoredDate)
+        } else {
+            console.log(date)
+            return -1
+        }
+    }).filter(date => date != -1)
+
+    const sellingPointDatesFormattedAmericanSorted = arrayManipulations.sortArraySmallToLarge(sellingPointDatesFormattedAmerican)
+
+    let count = 0;
+    const totalOverDates = sellingPointDatesFormattedAmericanSorted.map(date => {
+        count++
+        return {
+            date: date,
+            amount: count
+        }
+    })
+    const newResultArray = []
+    totalOverDates.forEach((date) => {
+        if (newResultArray.indexOf(date) == -1) {
+            newResultArray.push(date)
+        }
+    })
+
+    console.log(newResultArray)
+
+    console.log(totalOverDates)
+
     const sellingPointYears = refactoredSellingPointDates.map(date => date.year)
     //tel hoe vaak ieder jaar voorkomt
     const countedYears = calculations.countItemsinArray(sellingPointYears)
-    console.log(countedYears)
     //sorteer getelde lijst van groot naar klein op aantal
     const countedYearsSorted = arrayManipulations.sortArrayLargeToSmall(countedYears, 'aantal')
     //sorteer getelde lijst van groot naar klein op jaartal
-    const countedYearsSortedByYears = arrayManipulations.sortArrayLargeToSmall(countedYears, 'id')
+    const countedYearsSortedByYears = arrayManipulations.sortArraySmallToLarge(countedYears, 'id')
 
 
     const plaatsNamen = batchData.map(item => item.city)
     const countPlaatsnamen = calculations.countItemsinArray(plaatsNamen)
-    console.log(countPlaatsnamen)
-    //reverse geo
-    const arrayTest = [verkoopPuntenArray[0], verkoopPuntenArray[1], verkoopPuntenArray[3]]
+    console.log(countedYearsSorted)
 
+
+    const testObject = []
+    //maak random test object
+    for (let i = 0; i < 200; i++) {
+        testObject.push({
+            vermogen: Math.floor(Math.random() * 200 + 1),
+            groei: Math.floor(Math.random() * 40 + 1)
+        })
+    }
+    const sortedTestObject = arrayManipulations.sortArraySmallToLarge(testObject, 'groei')
+    console.log(sortedTestObject)
 
     /*********************************/
     /***************D3****************/
     /*********************************/
+    scatterPlot.createScatterPlot(testObject, 'vermogen', 'groei')
 
+
+    // barChart.createBarChart(countedYearsSorted, 'id', 'aantal')
     //maak bar chart met meegegeven x en y axis 
-    function ceateChartAantal(e) {
-        removeSVG() //verwijder vorige grafiek wanneer deze bestond
-        if (e.target.textContent == 'Aantal') {
-            d3Charts.createBarChart(countedYearsSorted, 'id', 'aantal')
-        } else {
-            d3Charts.createBarChart(countedYearsSortedByYears, 'id', 'aantal')
-        }
-    }
-    //kies sorteer optie doormiddel van knoppen
-    buttonJaar.addEventListener('click', ceateChartAantal);
-    buttonAantal.addEventListener('click', ceateChartAantal)
+    //     function ceateChartAantal(e) {
+    //         removeSVG() //verwijder vorige grafiek wanneer deze bestond
+    //         if (e.target.textContent == 'Aantal') {
+    //             barChart.createBarChart(countedYearsSorted, 'id', 'aantal')
+    //         } else {
+    //             barChart.createBarChart(countedYearsSortedByYears, 'id', 'aantal')
+    //         }
+    //     }
+    //     //kies sorteer optie doormiddel van knoppen
+    //     buttonJaar.addEventListener('click', ceateChartAantal);
+    //     buttonAantal.addEventListener('click', ceateChartAantal)
 })
 
 //returns promise with data from given url

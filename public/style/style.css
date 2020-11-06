@@ -33,6 +33,11 @@ body {
     margin: 1em;
 }
 
+circle {
+    fill: white;
+    opacity: .8;
+}
+
 #svg-container>div>div button {
     border: none;
     color: black;
@@ -66,9 +71,8 @@ h1 {
     color: orangered;
 }
 
-rect:hover {
+circle:hover {
     fill: orangered;
-
 }
 
 /* title */

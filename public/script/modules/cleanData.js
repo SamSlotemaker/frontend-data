@@ -7,8 +7,11 @@ export function refactorDates(dateArray) {
             newDate.year = date[0] + date[1] + date[2] + date[3]
             newDate.month = date[4] + date[5]
             newDate.day = date[6] + date[7]
-            newArray.push(newDate)
+
+        } else {
+            newDate = -1
         }
+        newArray.push(newDate)
     })
     return newArray;
 }
