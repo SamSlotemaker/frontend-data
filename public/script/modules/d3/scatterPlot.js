@@ -7,13 +7,14 @@ export function createScatterPlot(array, x, y) {
     //selecteer de container, en voeg een svg toe die even groot is (-100px)
     const svg = d3.select('#svg-container')
         .append("svg").attr("width", containerWidth - 100).attr("height", containerHeight - 100);
-    //grootte van svg
+
+    //standard variables
     const width = svg.attr('width')
     const height = svg.attr('height')
     const circleRadius = 10
     const graphTitle = 'Vermogen ten opzichten van groei in parkeer automaten'
     const margin = {
-        top: 50,
+        top: 70,
         right: 20,
         bottom: 80,
         left: 140
@@ -37,27 +38,31 @@ export function createScatterPlot(array, x, y) {
         const yScale = d3.scaleLinear()
             .domain([d3.max(data, yValue), d3.min(data, yValue)])
             .range([0, innerHeight])
-
+            .nice()
 
         //creeer groep voor grafiek
         const g = svg.append('g')
             .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
-        const xAxisTickFormat = number => d3.format('.2s')(number)
+        const xAxisTickFormat = number => d3.format('')(number)
 
+        //creer as an onderkant
         const xAxis = d3.axisBottom(xScale)
             .tickFormat(xAxisTickFormat)
             .tickSize(-innerHeight)
+            .tickPadding(15)
 
+        //creer as an zijkant
         const yAxis = d3.axisLeft(yScale)
             .tickSize(-innerWidth)
+            .tickPadding(15)
 
         //voeg groep toe en creer xas label
         const yAxisG = g.append('g')
             .call(yAxis)
-
         yAxisG.selectAll('.domain').remove()
 
+        //toevoegen van label aan Y-as
         yAxisG.append('text')
             .attr('fill', 'white')
             .attr('class', 'axis-label')
@@ -70,11 +75,11 @@ export function createScatterPlot(array, x, y) {
         //voeg groep toe en creer yas label
         const xAxisG = g.append('g')
             .call(xAxis)
-
         xAxisG
             .attr('transform', `translate(0, ${innerHeight})`)
             .selectAll('.domain').remove()
 
+        //toevoegen van legenda aan X-as
         xAxisG.append('text')
             .attr('y', 50)
             .attr('x', innerWidth / 2)
@@ -90,7 +95,7 @@ export function createScatterPlot(array, x, y) {
             .attr('cx', d => xScale(xValue(d))) //height wordt betpaald en geset voor ieder item
             .attr('r', circleRadius)
         g.append('text')
-            .attr('y', -20)
+            .attr('y', -40)
             .text(graphTitle)
     }
     renderBarChart(array)

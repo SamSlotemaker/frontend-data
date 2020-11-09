@@ -11,7 +11,7 @@ import {
 
 // API URL variabelen
 const geoVerkoopPuntenURL = 'https://opendata.rdw.nl/resource/cgqw-pfbp.json?$limit=100000&$offset=0'
-const tariefdeelURL = 'https://opendata.rdw.nl/resource/534e-5vdg.json?$limit=100'
+const tariefdeelURL = 'https://opendata.rdw.nl/resource/534e-5vdg.json?$limit=10000'
 
 
 // Kolomnaam variabelen
@@ -40,6 +40,47 @@ allPromises.then(data => {
     const verkoopPuntenArray = data[0]; //array met verkooppunten
     const tariefDeelArray = data[1] //array met prijs informatie
 
+    //vul tariefobjecten met uurprijs
+    tariefDeelArray.forEach(item => {
+        item.uurPrijs = calculations.calculatePricePerHour(item.amountfarepart, item.stepsizefarepart)
+    })
+
+    //vul verkooppunten objects met uurprijs gecombineerd op areamanagegrid
+    tariefDeelArray.forEach((item, ) => {
+        verkoopPuntenArray.forEach(verkooppunt => {
+            if (verkooppunt.areamanagerid == item.areamanagerid) {
+                verkooppunt.uurPrijs = item.uurPrijs
+            }
+        })
+    })
+
+    //totaal per stad
+    const totaalCity = calculations.countItemsinArray(verkoopPuntenArray)
+
+    //filter lege uurprijzen
+    const gefilterdeUurprijs = verkoopPuntenArray.filter(item => {
+        if (item.uurPrijs) {
+            return item;
+        }
+    })
+
+
+
+    //voeg steden toe aan rdw locaties
+    verkoopPuntenArray.forEach(item => {
+        batchData.forEach(location => {
+            if (location.latitude == item.location.latitude && location.longitude == item.location.longitude) {
+                item.city = location.city
+            }
+        })
+    })
+
+    //gemiddelde uurprijs per stad
+    const averageInCity = calculations.calculateAverageInArrayOfObjects(verkoopPuntenArray, 'uurPrijs')
+
+    //gemiddelde groei per stad
+    const growthPerCity = calculations.calculateAverageGrowthPerCity(verkoopPuntenArray)
+
     // filter arrays on columns
     //verkooppunten
     const sellingPointLocations = arrayManipulations.filterArray(verkoopPuntenArray, columnLocation)
@@ -51,44 +92,12 @@ allPromises.then(data => {
     const stepSizeInMinutes = arrayManipulations.filterArray(tariefDeelArray, columnStepSizeFarePart)
 
     //calculate price per hour for sellingpoints
-    const pricePerHour = calculations.calculatePricePerHour(amountPerStep, stepSizeInMinutes)
+    const pricePerHour = calculations.calculatePricePerHourArray(amountPerStep, stepSizeInMinutes)
     //sort price per hour from large to small
     const sortedPricePerHour = arrayManipulations.sortArrayLargeToSmall(pricePerHour)
 
     //refactor date strings to objects
     const refactoredSellingPointDates = cleanData.refactorDates(sellingPointDate)
-
-    //refactor dates to JS date objects and filter empty dates
-    const sellingPointDatesFormattedAmerican = refactoredSellingPointDates.map(date => {
-        if (date != -1) {
-            const factoredDate = `${date.year}-${date.month}-${date.day}`
-            return new Date(factoredDate)
-        } else {
-            console.log(date)
-            return -1
-        }
-    }).filter(date => date != -1)
-
-    const sellingPointDatesFormattedAmericanSorted = arrayManipulations.sortArraySmallToLarge(sellingPointDatesFormattedAmerican)
-
-    let count = 0;
-    const totalOverDates = sellingPointDatesFormattedAmericanSorted.map(date => {
-        count++
-        return {
-            date: date,
-            amount: count
-        }
-    })
-    const newResultArray = []
-    totalOverDates.forEach((date) => {
-        if (newResultArray.indexOf(date) == -1) {
-            newResultArray.push(date)
-        }
-    })
-
-    console.log(newResultArray)
-
-    console.log(totalOverDates)
 
     const sellingPointYears = refactoredSellingPointDates.map(date => date.year)
     //tel hoe vaak ieder jaar voorkomt
@@ -98,10 +107,8 @@ allPromises.then(data => {
     //sorteer getelde lijst van groot naar klein op jaartal
     const countedYearsSortedByYears = arrayManipulations.sortArraySmallToLarge(countedYears, 'id')
 
-
     const plaatsNamen = batchData.map(item => item.city)
     const countPlaatsnamen = calculations.countItemsinArray(plaatsNamen)
-    console.log(countedYearsSorted)
 
 
     const testObject = []
@@ -112,76 +119,14 @@ allPromises.then(data => {
             groei: Math.floor(Math.random() * 40 + 1)
         })
     }
-    const sortedTestObject = arrayManipulations.sortArraySmallToLarge(testObject, 'groei')
-    console.log(sortedTestObject)
 
     /*********************************/
     /***************D3****************/
     /*********************************/
-    scatterPlot.createScatterPlot(testObject, 'vermogen', 'groei')
-
-
-    // barChart.createBarChart(countedYearsSorted, 'id', 'aantal')
-    //maak bar chart met meegegeven x en y axis 
-    //     function ceateChartAantal(e) {
-    //         removeSVG() //verwijder vorige grafiek wanneer deze bestond
-    //         if (e.target.textContent == 'Aantal') {
-    //             barChart.createBarChart(countedYearsSorted, 'id', 'aantal')
-    //         } else {
-    //             barChart.createBarChart(countedYearsSortedByYears, 'id', 'aantal')
-    //         }
-    //     }
-    //     //kies sorteer optie doormiddel van knoppen
-    //     buttonJaar.addEventListener('click', ceateChartAantal);
-    //     buttonAantal.addEventListener('click', ceateChartAantal)
+    scatterPlot.createScatterPlot(testObject, 'groei', 'vermogen')
 })
 
 //returns promise with data from given url
 export function getData(url) {
     return fetch(url)
 }
-
-//verwijder een bestaande grafiek op de pagina wanneer deze bestaat
-function removeSVG() {
-    let SVG = document.querySelector('svg')
-    if (SVG) {
-        SVG.remove();
-    }
-}
-//downloads file
-function download(content, fileName, contentType) {
-    var a = document.createElement("a");
-    var file = new Blob([content], {
-        type: contentType
-    });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-}
-
-// //maak array in het juiste format voor API
-// const nieuweVerkoopArray = verkoopPuntenArray.map((punt, index) => {
-//     const object = {
-//         id: index,
-//         params: {
-//             lat: punt.location.latitude,
-//             lon: punt.location.longitude
-//         }
-//     }
-//     return object
-// })
-
-// var useApiData = {
-//     "api": "/v1/geocode/reverse",
-//     "params": {
-//         "lang": "nl",
-//     },
-//     "inputs": nieuweVerkoopArray
-// };
-
-// reverseGeo.batchGeo(useApiData).then(data => {
-//     return JSON.stringify(data)
-// }).then(data => {
-//     // console.log(data)
-//     download(data, 'json.txt', 'text/plain');
-// })
