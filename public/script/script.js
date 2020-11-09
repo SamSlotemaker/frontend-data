@@ -81,6 +81,9 @@ allPromises.then(data => {
     //gemiddelde groei per stad
     const growthPerCity = calculations.calculateAverageGrowthPerCity(verkoopPuntenArray)
 
+    console.log(averageInCity)
+    console.log(growthPerCity)
+
     // filter arrays on columns
     //verkooppunten
     const sellingPointLocations = arrayManipulations.filterArray(verkoopPuntenArray, columnLocation)

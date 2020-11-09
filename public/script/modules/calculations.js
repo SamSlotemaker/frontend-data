@@ -155,7 +155,11 @@
          item.jarenVerschil = difference + 1
          item.groeiPerJaar = item.jaren.length / item.jarenVerschil
      })
-
-
-     console.log(allYearsPerCity)
+     const filteredGrowth = allYearsPerCity.map(item => {
+         return {
+             city: item.stad,
+             groeiPerJaar: item.groeiPerJaar
+         }
+     })
+     return filteredGrowth
  }
