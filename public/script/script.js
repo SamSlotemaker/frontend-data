@@ -13,18 +13,6 @@ import {
 const geoVerkoopPuntenURL = 'https://opendata.rdw.nl/resource/cgqw-pfbp.json?$limit=100000&$offset=0'
 const tariefdeelURL = 'https://opendata.rdw.nl/resource/534e-5vdg.json?$limit=10000'
 
-
-// Kolomnaam variabelen
-const columnLocation = 'location'
-const columnStartDateSellingpoint = 'startdatesellingpoint'
-const columnStepSizeFarePart = 'stepsizefarepart'
-const columnAmountFarePart = 'amountfarepart'
-
-//ophalen sorteer buttons
-const buttonJaar = document.querySelector('#svg-container > div > div button:first-of-type')
-const buttonAantal = document.querySelector('#svg-container > div > div button:last-of-type')
-
-
 //ophalen data
 const verkoopPunten = getData(geoVerkoopPuntenURL);
 const tariefDeel = getData(tariefdeelURL)
@@ -34,6 +22,7 @@ const allPromises = Promise.all([verkoopPunten, tariefDeel]).then(res => {
     const responses = res.map(response => response.json())
     return Promise.all(responses)
 })
+
 //wanneer data vertaald is naar json:
 allPromises.then(data => {
     //ophalen arrays uit de data
@@ -43,61 +32,40 @@ allPromises.then(data => {
     //vul tariefobjecten met uurprijs
     fillPricePerHour(tariefDeelArray)
 
-    function fillPricePerHour(array) {
-        array.forEach(item => {
-            item.uurPrijs = calculations.calculatePricePerHour(item.amountfarepart, item.stepsizefarepart)
-        })
-    }
-
+    //voeg uurprijs toe aan verkooppunten gejoind met areamanagerid
     joinObjects(tariefDeelArray, verkoopPuntenArray, 'areamanagerid', 'areamanagerid', 'uurPrijs', 'uurPrijs')
-
-
-    //vul verkooppunten objects met uurprijs gecombineerd op areamanagegrid
-
     //voeg steden toe aan rdw locaties
-    verkoopPuntenArray.forEach(item => {
-        batchData.forEach(location => {
-            if (location.latitude == item.location.latitude && location.longitude == item.location.longitude) {
-                item.city = location.city
-            }
-        })
-    })
-
-
-
-    function joinObjects(array1, array2, columnNameKey1, columnNameKey2, columnResult1, columnResult2) {
-        array1.forEach((item) => {
-            array2.forEach(verkooppunt => {
-                if (verkooppunt[columnNameKey1] == item[columnNameKey2]) {
-                    verkooppunt[columnResult1] = item[columnResult2]
-                }
-            })
-        })
-    }
-
+    fillCities(verkoopPuntenArray, batchData)
     //gemiddelde uurprijs per stad
     const averageInCity = calculations.calculateAverageInArrayOfObjects(verkoopPuntenArray, 'uurPrijs')
     //gemiddelde groei per stad
     const growthPerCity = calculations.calculateAverageGrowthPerCity(verkoopPuntenArray)
-
     //vul verkooppunten met beide gemiddelden
+    fillSellingpointsWithAverages(verkoopPuntenArray, averageInCity, growthPerCity)
 
-    verkoopPuntenArray.forEach(verkooppunt => {
-        averageInCity.forEach(gemiddelde => {
-            if (verkooppunt.city == gemiddelde.id) {
-                verkooppunt.gemiddeldeUurPrijs = gemiddelde.gemiddelde
-            }
-        })
-        growthPerCity.forEach(groei => {
-            if (verkooppunt.city == groei.city) {
-                verkooppunt.gemiddeldeGroeiPerJaar = groei.groeiPerJaar
-            }
+
+    //filter verkooppunten op benodigde data
+    const scatterPlotData = arrayManipulations.filterArrayThreeColumns(verkoopPuntenArray, 'city', 'gemiddeldeUurPrijs', 'gemiddeldeGroeiPerJaar')
+    //verkrijg alle unieke steden
+    const uniqueScatterPlotData = arrayManipulations.uniqueArrayOfObjects(scatterPlotData, 'city')
+    //vul een lege array met een object per unieke stad
+    const scatterPlotArray = []
+    uniqueScatterPlotData.forEach(item => {
+        scatterPlotArray.push({
+            city: item
         })
     })
 
-    const scatterPlotData = arrayManipulations.filterArrayThreeColumns(verkoopPuntenArray, 'city', 'gemiddeldeUurPrijs', 'gemiddeldeGroeiPerJaar')
-    console.log(scatterPlotData)
-
+    //check voor elk verkooppunt of de stad bestaat in de array van objecten  
+    //zo ja, vul deze met de uurprijs
+    scatterPlotArray.forEach(item => {
+        scatterPlotData.forEach(item2 => {
+            if (item.city == item2.city) {
+                item.gemiddeldeUurPrijs = item2.gemiddeldeUurPrijs
+                item.gemiddeldeGroeiPerJaar = item2.gemiddeldeGroeiPerJaar
+            }
+        })
+    })
 
     const testObject = []
     //maak random test object
@@ -111,10 +79,60 @@ allPromises.then(data => {
     /*********************************/
     /***************D3****************/
     /*********************************/
-    scatterPlot.createScatterPlot(testObject, 'groei', 'vermogen')
+    console.log(testObject)
+    console.log(scatterPlotArray)
+    // scatterPlot.createScatterPlot(testObject, 'groei', 'vermogen')
+    scatterPlot.createScatterPlot(scatterPlotArray, 'gemiddeldeGroeiPerJaar', 'gemiddeldeUurPrijs')
+
 })
 
 //returns promise with data from given url
 export function getData(url) {
     return fetch(url)
+}
+
+//bereken price per hour in de meegegeven array en vul deze met resultaat
+function fillPricePerHour(array) {
+    array.forEach(item => {
+        item.uurPrijs = calculations.calculatePricePerHour(item.amountfarepart, item.stepsizefarepart)
+    })
+}
+
+//vul steden doormidden van het checken van lat- en longitude
+function fillCities(array1, array2) {
+    array1.forEach(item => {
+        array2.forEach(location => {
+            if (location.latitude == item.location.latitude && location.longitude == item.location.longitude) {
+                item.city = location.city
+            }
+        })
+    })
+}
+
+//vull verkooppunten met gemiddeldes van andere objecten, stad is hierin de key
+function fillSellingpointsWithAverages(array1, array2, array3) {
+    array1.forEach(verkooppunt => {
+        array2.forEach(gemiddelde => {
+            if (verkooppunt.city == gemiddelde.id) {
+                verkooppunt.gemiddeldeUurPrijs = gemiddelde.gemiddelde
+            }
+        })
+        array3.forEach(groei => {
+            if (verkooppunt.city == groei.city) {
+                verkooppunt.gemiddeldeGroeiPerJaar = groei.groeiPerJaar
+            }
+        })
+    })
+
+}
+
+//join twee objecten doormiddel van meegegeven keys en vul de meegegeven proprties
+function joinObjects(array1, array2, columnNameKey1, columnNameKey2, columnResult1, columnResult2) {
+    array1.forEach((item) => {
+        array2.forEach(verkooppunt => {
+            if (verkooppunt[columnNameKey1] == item[columnNameKey2]) {
+                verkooppunt[columnResult1] = item[columnResult2]
+            }
+        })
+    })
 }

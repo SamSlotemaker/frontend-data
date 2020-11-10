@@ -19,6 +19,8 @@ const margin = {
     left: 140
 }
 
+
+
 //bereken maximale lengtes van grafiek
 const innerWidth = width - margin.left - margin.right
 const innerHeight = height - margin.top - margin.bottom
@@ -34,7 +36,8 @@ export function createScatterPlot(array, x, y) {
     const renderBarChart = data => {
         //maak schaal aan voor assen
         const xScale = d3.scaleLinear()
-            .domain(d3.extent(data, xValue))
+            // .domain(d3.extent(data, xValue))
+            .domain([0, 250])
             .range([0, innerWidth])
             .nice()
         const yScale = d3.scaleLinear()
@@ -104,20 +107,28 @@ export function createScatterPlot(array, x, y) {
 
         //mouseover event
         function mouseOverEvent(d, i) {
+            //verwijder alle niet letter en numerieke charachters als id's
+            let city = i.city;
+            let id = city.replace(/[\W_]+/g, "");
+
             //vergroot circle radius * 2
             d3.select(this).transition().attr('r', circleRadius * 2)
             //voel label toe met id om later te verwijderen
             svg.append('text')
-                .attr('id', "t" + i[x] + '-' + i[y])
+                .attr('id', "t" + id)
                 .attr('x', d.pageX - 30)
                 .attr('y', d.pageY - 50)
-                .text(`${i[y]}, ${i[x]}`)
+                .text(i.city)
         }
 
         //mouseout event
         function mouseOutEvent(d, i) {
+            //verwijder alle niet letter en numerieke charachters als id's
+            let city = i.city;
+            let id = city.replace(/[\W_]+/g, "");
+
             d3.select(this).transition().attr('r', circleRadius) //radius naar normaal
-            d3.select("#t" + i[x] + '-' + i[y]).remove() //verwijder toegevoegd label
+            d3.select("#t" + id).remove() //verwijder toegevoegd label
         }
     }
     renderBarChart(array)

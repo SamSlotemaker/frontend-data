@@ -54,3 +54,7 @@ export function filterArrayThreeColumns(array, columnOne, columnTwo, columnThree
 export function uniqueArray(array) {
     return [...new Set(array)];
 }
+
+export function uniqueArrayOfObjects(array, property) {
+    return [...new Set(array.map(item => item[property]))];
+}
