@@ -31,7 +31,6 @@ allPromises.then(data => {
 
     //vul tariefobjecten met uurprijs
     fillPricePerHour(tariefDeelArray)
-
     //voeg uurprijs toe aan verkooppunten gejoind met areamanagerid
     joinObjects(tariefDeelArray, verkoopPuntenArray, 'areamanagerid', 'areamanagerid', 'uurPrijs', 'uurPrijs')
     //voeg steden toe aan rdw locaties
@@ -42,8 +41,6 @@ allPromises.then(data => {
     const growthPerCity = calculations.calculateAverageGrowthPerCity(verkoopPuntenArray)
     //vul verkooppunten met beide gemiddelden
     fillSellingpointsWithAverages(verkoopPuntenArray, averageInCity, growthPerCity)
-
-
     //filter verkooppunten op benodigde data
     const scatterPlotData = arrayManipulations.filterArrayThreeColumns(verkoopPuntenArray, 'city', 'gemiddeldeUurPrijs', 'gemiddeldeGroeiPerJaar')
     //verkrijg alle unieke steden

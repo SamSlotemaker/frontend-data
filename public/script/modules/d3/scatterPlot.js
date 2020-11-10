@@ -20,26 +20,26 @@ const margin = {
 }
 
 
-
 //bereken maximale lengtes van grafiek
 const innerWidth = width - margin.left - margin.right
 const innerHeight = height - margin.top - margin.bottom
 
+//cip path maken zodat bolletjes niet buiten de assen komen
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+    .append("rect")
+    .attr("width", innerWidth)
+    .attr("height", innerHeight);
 
 export function createScatterPlot(array, x, y) {
-
-
-
     //callback functions die loopen over de waardes
     const xValue = d => d[x]
     const yValue = d => d[y]
 
-
     //render de chart
     const renderBarChart = data => {
-
         var zoom = d3.zoom()
-            .scaleExtent([.5, 20])
+            .scaleExtent([1, 20])
             .extent([
                 [0, 0],
                 [width, height]
@@ -103,26 +103,28 @@ export function createScatterPlot(array, x, y) {
             .attr('class', 'axis-label')
             .text(x)
 
-
+        //creer aparte groep voor de getekende punten met een clip path
+        var points_g = g.append("g")
+            .attr("clip-path", "url(#clip)")
+            .classed("points_g", true);
 
         //selecteer alle rectangles in parent element 'g'
-        var points = g.selectAll('circle')
-            .data(data)
-        points
-            .enter().append('circle') //voeg rectangles toe wanneer deze niet bestaan
+        var points = points_g.selectAll('circle').data(data)
+        points = points.enter().append('circle') //voeg rectangles toe wanneer deze niet bestaan
             .attr('cy', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
             .attr('cx', d => xScale(xValue(d))) //height wordt betpaald en geset voor ieder item
             .attr('r', circleRadius)
+            .attr('fill', 'white')
             .on('mouseover', mouseOverEvent)
             .on('mouseout', mouseOutEvent)
+
         g.append('text')
             .attr('y', -40)
             .text(graphTitle)
-
-
+        //call zoom function op de svg
         svg.call(zoom);
 
-
+        //zoomed wordt uitgevoerd op het scrollevent
         function zoomed(e) {
             console.log('zooom')
             // create new scale ojects based on event
@@ -133,21 +135,20 @@ export function createScatterPlot(array, x, y) {
             yAxisG.call(yAxis.scale(new_yScale));
             //update points
             points.data(data)
-                .attr('cx', function (d) {
-                    return new_xScale(xValue(d))
-                })
+                .attr('cx', (d) => new_xScale(xValue(d)))
                 .attr('cy', function (d) {
                     return new_yScale(yValue(d))
                 });
         }
+
         //mouseover event
         function mouseOverEvent(d, i) {
             //verwijder alle niet letter en numerieke charachters als id's
             let city = i.city;
             let id = city.replace(/[\W_]+/g, "");
-
             //vergroot circle radius * 2
             d3.select(this).transition().attr('r', circleRadius * 2)
+                .attr('fill', 'orangered')
             //voel label toe met id om later te verwijderen
             svg.append('text')
                 .attr('id', "t" + id)
@@ -161,8 +162,8 @@ export function createScatterPlot(array, x, y) {
             //verwijder alle niet letter en numerieke charachters als id's
             let city = i.city;
             let id = city.replace(/[\W_]+/g, "");
-
             d3.select(this).transition().attr('r', circleRadius) //radius naar normaal
+                .attr('fill', 'white')
             d3.select("#t" + id).remove() //verwijder toegevoegd label
         }
     }
