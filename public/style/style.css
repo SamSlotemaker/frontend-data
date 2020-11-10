@@ -71,9 +71,9 @@ h1 {
     color: orangered;
 }
 
-circle:hover {
+/* circle:hover {
     fill: orangered;
-}
+} */
 
 /* title */
 svg>g>text {
@@ -92,4 +92,13 @@ text {
     font-weight: bold;
     color: white;
     fill: white;
+}
+
+svg>text {
+    fill: orangered;
+    text-shadow:
+        -1px -1px 0 #fff,
+        1px -1px 0 #fff,
+        -1px 1px 0 #fff,
+        1px 1px 0 #fff;
 }

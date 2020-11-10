@@ -1,28 +1,30 @@
+const container = document.querySelector('#svg-container')
+//grootte van de container
+const containerWidth = container.offsetWidth;
+const containerHeight = container.offsetHeight
+
+//selecteer de container, en voeg een svg toe die even groot is (-100px)
+const svg = d3.select('#svg-container')
+    .append("svg").attr("width", containerWidth - 100).attr("height", containerHeight - 100);
+
+//standard variables
+const width = svg.attr('width')
+const height = svg.attr('height')
+const circleRadius = 10
+const graphTitle = 'Vermogen ten opzichten van groei in parkeer automaten'
+const margin = {
+    top: 70,
+    right: 20,
+    bottom: 80,
+    left: 140
+}
+
+//bereken maximale lengtes van grafiek
+const innerWidth = width - margin.left - margin.right
+const innerHeight = height - margin.top - margin.bottom
+
 export function createScatterPlot(array, x, y) {
-    const container = document.querySelector('#svg-container')
-    //grootte van de container
-    const containerWidth = container.offsetWidth;
-    const containerHeight = container.offsetHeight
 
-    //selecteer de container, en voeg een svg toe die even groot is (-100px)
-    const svg = d3.select('#svg-container')
-        .append("svg").attr("width", containerWidth - 100).attr("height", containerHeight - 100);
-
-    //standard variables
-    const width = svg.attr('width')
-    const height = svg.attr('height')
-    const circleRadius = 10
-    const graphTitle = 'Vermogen ten opzichten van groei in parkeer automaten'
-    const margin = {
-        top: 70,
-        right: 20,
-        bottom: 80,
-        left: 140
-    }
-
-    //bereken maximale lengtes van grafiek
-    const innerWidth = width - margin.left - margin.right
-    const innerHeight = height - margin.top - margin.bottom
 
     //callback functions die loopen over de waardes
     const xValue = d => d[x]
@@ -94,9 +96,30 @@ export function createScatterPlot(array, x, y) {
             .attr('cy', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
             .attr('cx', d => xScale(xValue(d))) //height wordt betpaald en geset voor ieder item
             .attr('r', circleRadius)
+            .on('mouseover', mouseOverEvent)
+            .on('mouseout', mouseOutEvent)
         g.append('text')
             .attr('y', -40)
             .text(graphTitle)
+
+
+        function mouseOverEvent(d, i) {
+            console.log(i)
+            console.log('mouseOver')
+            console.log(d)
+            d3.select(this).transition().attr('r', circleRadius * 2)
+            svg.append('text')
+                .attr('id', "t" + i[x] + '-' + i[y])
+                .attr('x', d.pageX - 30)
+                .attr('y', d.pageY - 50)
+                .text(`${i[y]}, ${i[x]}`)
+        }
+
+        function mouseOutEvent(d, i) {
+            console.log('mouseOut')
+            d3.select(this).transition().attr('r', circleRadius)
+            d3.select("#t" + i[x] + '-' + i[y]).remove()
+        }
     }
     renderBarChart(array)
 }
