@@ -41,30 +41,18 @@ allPromises.then(data => {
     const tariefDeelArray = data[1] //array met prijs informatie
 
     //vul tariefobjecten met uurprijs
-    tariefDeelArray.forEach(item => {
-        item.uurPrijs = calculations.calculatePricePerHour(item.amountfarepart, item.stepsizefarepart)
-    })
+    fillPricePerHour(tariefDeelArray)
+
+    function fillPricePerHour(array) {
+        array.forEach(item => {
+            item.uurPrijs = calculations.calculatePricePerHour(item.amountfarepart, item.stepsizefarepart)
+        })
+    }
+
+    joinObjects(tariefDeelArray, verkoopPuntenArray, 'areamanagerid', 'areamanagerid', 'uurPrijs', 'uurPrijs')
+
 
     //vul verkooppunten objects met uurprijs gecombineerd op areamanagegrid
-    tariefDeelArray.forEach((item, ) => {
-        verkoopPuntenArray.forEach(verkooppunt => {
-            if (verkooppunt.areamanagerid == item.areamanagerid) {
-                verkooppunt.uurPrijs = item.uurPrijs
-            }
-        })
-    })
-
-    //totaal per stad
-    const totaalCity = calculations.countItemsinArray(verkoopPuntenArray)
-
-    //filter lege uurprijzen
-    const gefilterdeUurprijs = verkoopPuntenArray.filter(item => {
-        if (item.uurPrijs) {
-            return item;
-        }
-    })
-
-
 
     //voeg steden toe aan rdw locaties
     verkoopPuntenArray.forEach(item => {
@@ -75,43 +63,40 @@ allPromises.then(data => {
         })
     })
 
+
+
+    function joinObjects(array1, array2, columnNameKey1, columnNameKey2, columnResult1, columnResult2) {
+        array1.forEach((item) => {
+            array2.forEach(verkooppunt => {
+                if (verkooppunt[columnNameKey1] == item[columnNameKey2]) {
+                    verkooppunt[columnResult1] = item[columnResult2]
+                }
+            })
+        })
+    }
+
     //gemiddelde uurprijs per stad
     const averageInCity = calculations.calculateAverageInArrayOfObjects(verkoopPuntenArray, 'uurPrijs')
-
     //gemiddelde groei per stad
     const growthPerCity = calculations.calculateAverageGrowthPerCity(verkoopPuntenArray)
 
-    console.log(averageInCity)
-    console.log(growthPerCity)
+    //vul verkooppunten met beide gemiddelden
 
-    // filter arrays on columns
-    //verkooppunten
-    const sellingPointLocations = arrayManipulations.filterArray(verkoopPuntenArray, columnLocation)
-    //start verkoopdatum
-    const sellingPointDate = arrayManipulations.filterArray(verkoopPuntenArray, columnStartDateSellingpoint)
-    //prijs per stap
-    const amountPerStep = arrayManipulations.filterArray(tariefDeelArray, columnAmountFarePart)
-    //grootte van stap in minuten
-    const stepSizeInMinutes = arrayManipulations.filterArray(tariefDeelArray, columnStepSizeFarePart)
+    verkoopPuntenArray.forEach(verkooppunt => {
+        averageInCity.forEach(gemiddelde => {
+            if (verkooppunt.city == gemiddelde.id) {
+                verkooppunt.gemiddeldeUurPrijs = gemiddelde.gemiddelde
+            }
+        })
+        growthPerCity.forEach(groei => {
+            if (verkooppunt.city == groei.city) {
+                verkooppunt.gemiddeldeGroeiPerJaar = groei.groeiPerJaar
+            }
+        })
+    })
 
-    //calculate price per hour for sellingpoints
-    const pricePerHour = calculations.calculatePricePerHourArray(amountPerStep, stepSizeInMinutes)
-    //sort price per hour from large to small
-    const sortedPricePerHour = arrayManipulations.sortArrayLargeToSmall(pricePerHour)
-
-    //refactor date strings to objects
-    const refactoredSellingPointDates = cleanData.refactorDates(sellingPointDate)
-
-    const sellingPointYears = refactoredSellingPointDates.map(date => date.year)
-    //tel hoe vaak ieder jaar voorkomt
-    const countedYears = calculations.countItemsinArray(sellingPointYears)
-    //sorteer getelde lijst van groot naar klein op aantal
-    const countedYearsSorted = arrayManipulations.sortArrayLargeToSmall(countedYears, 'aantal')
-    //sorteer getelde lijst van groot naar klein op jaartal
-    const countedYearsSortedByYears = arrayManipulations.sortArraySmallToLarge(countedYears, 'id')
-
-    const plaatsNamen = batchData.map(item => item.city)
-    const countPlaatsnamen = calculations.countItemsinArray(plaatsNamen)
+    const scatterPlotData = arrayManipulations.filterArrayThreeColumns(verkoopPuntenArray, 'city', 'gemiddeldeUurPrijs', 'gemiddeldeGroeiPerJaar')
+    console.log(scatterPlotData)
 
 
     const testObject = []

@@ -102,12 +102,11 @@ export function createScatterPlot(array, x, y) {
             .attr('y', -40)
             .text(graphTitle)
 
-
+        //mouseover event
         function mouseOverEvent(d, i) {
-            console.log(i)
-            console.log('mouseOver')
-            console.log(d)
+            //vergroot circle radius * 2
             d3.select(this).transition().attr('r', circleRadius * 2)
+            //voel label toe met id om later te verwijderen
             svg.append('text')
                 .attr('id', "t" + i[x] + '-' + i[y])
                 .attr('x', d.pageX - 30)
@@ -115,10 +114,10 @@ export function createScatterPlot(array, x, y) {
                 .text(`${i[y]}, ${i[x]}`)
         }
 
+        //mouseout event
         function mouseOutEvent(d, i) {
-            console.log('mouseOut')
-            d3.select(this).transition().attr('r', circleRadius)
-            d3.select("#t" + i[x] + '-' + i[y]).remove()
+            d3.select(this).transition().attr('r', circleRadius) //radius naar normaal
+            d3.select("#t" + i[x] + '-' + i[y]).remove() //verwijder toegevoegd label
         }
     }
     renderBarChart(array)
