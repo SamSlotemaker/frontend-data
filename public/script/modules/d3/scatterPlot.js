@@ -25,19 +25,30 @@ const margin = {
 const innerWidth = width - margin.left - margin.right
 const innerHeight = height - margin.top - margin.bottom
 
+
 export function createScatterPlot(array, x, y) {
+
 
 
     //callback functions die loopen over de waardes
     const xValue = d => d[x]
     const yValue = d => d[y]
 
+
     //render de chart
     const renderBarChart = data => {
+
+        var zoom = d3.zoom()
+            .scaleExtent([.5, 20])
+            .extent([
+                [0, 0],
+                [width, height]
+            ])
+            .on("zoom", zoomed);
+
         //maak schaal aan voor assen
         const xScale = d3.scaleLinear()
-            // .domain(d3.extent(data, xValue))
-            .domain([0, 250])
+            .domain(d3.extent(data, xValue))
             .range([0, innerWidth])
             .nice()
         const yScale = d3.scaleLinear()
@@ -92,9 +103,12 @@ export function createScatterPlot(array, x, y) {
             .attr('class', 'axis-label')
             .text(x)
 
+
+
         //selecteer alle rectangles in parent element 'g'
-        g.selectAll('circle')
+        var points = g.selectAll('circle')
             .data(data)
+        points
             .enter().append('circle') //voeg rectangles toe wanneer deze niet bestaan
             .attr('cy', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
             .attr('cx', d => xScale(xValue(d))) //height wordt betpaald en geset voor ieder item
@@ -105,6 +119,27 @@ export function createScatterPlot(array, x, y) {
             .attr('y', -40)
             .text(graphTitle)
 
+
+        svg.call(zoom);
+
+
+        function zoomed(e) {
+            console.log('zooom')
+            // create new scale ojects based on event
+            var new_xScale = e.transform.rescaleX(xScale);
+            var new_yScale = e.transform.rescaleY(yScale);
+            // update axes
+            xAxisG.call(xAxis.scale(new_xScale));
+            yAxisG.call(yAxis.scale(new_yScale));
+            //update points
+            points.data(data)
+                .attr('cx', function (d) {
+                    return new_xScale(xValue(d))
+                })
+                .attr('cy', function (d) {
+                    return new_yScale(yValue(d))
+                });
+        }
         //mouseover event
         function mouseOverEvent(d, i) {
             //verwijder alle niet letter en numerieke charachters als id's
