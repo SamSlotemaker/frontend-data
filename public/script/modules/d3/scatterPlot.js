@@ -19,6 +19,8 @@ const margin = {
     left: 140
 }
 
+let yVar = "gemiddeldeUurPrijs"
+let xVar = "gemiddeldeGroeiPerJaar"
 
 //bereken maximale lengtes van grafiek
 const innerWidth = width - margin.left - margin.right
@@ -34,10 +36,11 @@ svg.append("defs").append("clipPath")
 
 
 
-export function createScatterPlot(array, x, y) {
+
+export function createScatterPlot(array) {
     //callback functions die loopen over de waardes
-    const xValue = d => d[x]
-    const yValue = d => d[y]
+    const xValue = d => d[xVar]
+    const yValue = d => d[yVar]
 
 
 
@@ -51,7 +54,6 @@ export function createScatterPlot(array, x, y) {
             ])
             .on("zoom", zoomed)
 
-        console.log(Object.getOwnPropertyNames(data[0]))
         let propertyNames = Object.getOwnPropertyNames(data[0])
         let propertyNamesWithoutCity = propertyNames.slice(1, 4)
         let yFields = propertyNamesWithoutCity
@@ -99,7 +101,7 @@ export function createScatterPlot(array, x, y) {
             .attr('fill', 'white')
             .attr('class', 'axis-label')
             .attr('transform', `rotate(-90)`)
-            .text(y)
+            .text(yVar)
             .attr('y', -50)
             .attr('x', -innerHeight / 2)
             .attr('text-anchor', 'middle')
@@ -117,7 +119,7 @@ export function createScatterPlot(array, x, y) {
             .attr('x', innerWidth / 2)
             .attr('fill', 'white')
             .attr('class', 'axis-label')
-            .text(x)
+            .text(xVar)
 
         //creer aparte groep voor de getekende punten met een clip path
         var points_g = g.append("g")
@@ -127,35 +129,44 @@ export function createScatterPlot(array, x, y) {
         //selecteer alle circles in parent element 'points_g'
         var points = points_g.selectAll('circle').data(data)
 
-        points = points.enter().append('circle')
-            .on('mouseover', mouseOverEvent)
-            .on('mouseout', mouseOutEvent)
-            .attr('cy', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
-            .attr('cx', d => xScale(xValue(d))) //x attribute wordt geset voor ieter item
-            .attr('r', circleRadius) //circle radius
-            .attr('fill', 'white')
-
-        //verwijder overige bolletjes
-        points.exit().remove()
-
+        //roep 1 keer aan bij laden grafiek
+        selectionChangedY()
 
         //title toevoegen
         g.append('text')
             .attr('y', -40)
             .text(graphTitle)
 
+        function selectionChangedY() {
+            //this is the form element
+            yVar = this ? this.value : yVar
+            console.log(yVar)
+
+            yScale.domain()
+            points = points.enter().append('circle')
+                .on('mouseover', mouseOverEvent)
+                .on('mouseout', mouseOutEvent)
+                .attr('cy', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
+                .attr('cx', d => xScale(xValue(d))) //x attribute wordt geset voor ieter item
+                .attr('r', circleRadius) //circle radius
+                .attr('fill', 'white')
+
+            //verwijder overige bolletjes
+            points.exit().remove()
+        }
 
         function setupInput(yFields, xFields) {
             d3.select('form')
                 .append('select')
                 .text("Select a text value")
-                // .on('change', selectionChangedY)
+                .on('change', selectionChangedY)
                 .selectAll('option')
                 .data(yFields)
                 .enter()
                 .append('option')
                 .attr('value', d => d)
                 .text(d => "Y-as: " + d)
+                .property("selected", d => d === yVar)
         }
 
         //zoomed wordt uitgevoerd op het scrollevent
