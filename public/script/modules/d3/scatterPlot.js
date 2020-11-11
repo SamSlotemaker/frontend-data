@@ -3,6 +3,14 @@ const container = document.querySelector('#svg-container')
 const containerWidth = container.offsetWidth;
 const containerHeight = container.offsetHeight
 
+//globale variabelen voor functies
+let xScale;
+let yScale;
+let xAxis;
+let yAxis;
+let yAxisG;
+let xAxisG;
+
 //selecteer de container, en voeg een svg toe die even groot is (-100px)
 const svg = d3.select('#svg-container')
     .append("svg").attr("width", containerWidth - 100).attr("height", containerHeight - 100);
@@ -19,7 +27,6 @@ const margin = {
     left: 140
 }
 
-
 //bereken maximale lengtes van grafiek
 const innerWidth = width - margin.left - margin.right
 const innerHeight = height - margin.top - margin.bottom
@@ -31,10 +38,6 @@ svg.append("defs").append("clipPath")
     .attr("width", innerWidth)
     .attr("height", innerHeight);
 
-
-
-
-
 export function createScatterPlot(array, x, y) {
     let yVar = y
     let xVar = x
@@ -42,8 +45,6 @@ export function createScatterPlot(array, x, y) {
     //callback functions die loopen over de waardes
     const xValue = d => d[xVar]
     const yValue = d => d[yVar]
-
-
 
     //render de chart
     const renderBarChart = data => {
@@ -55,44 +56,35 @@ export function createScatterPlot(array, x, y) {
             ])
             .on("zoom", zoomed)
 
+        //haal propertynames uit de data voor de filteropties
         let propertyNames = Object.getOwnPropertyNames(data[0])
         let propertyNamesWithoutCity = propertyNames.slice(1, 4)
         let yFields = propertyNamesWithoutCity
-
-
+        //call zoom op de parent svg voor de zoom functionaliteit
         svg.call(zoom);
 
-        //globale variabelen voor functies
-        let xScale;
-        let yScale;
-        let xAxis;
-        let yAxis;
-        let yAxisG;
-        let xAxisG;
 
         //creeer groep voor grafiek
         const g = svg.append('g')
             .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
+        //title toevoegen
+        g.append('text')
+            .attr('y', -40)
+            .text(graphTitle)
+
+        //initiele setup
         setupScales()
         setupInput(yFields)
         setupAxis()
-
 
         //creer aparte groep voor de getekende punten met een clip path
         var points_g = g.append("g")
             .attr("clip-path", "url(#clip)")
             .classed("points_g", true);
-
         var points;
-
         //roep 1 keer aan bij laden grafiek
         selectionChangedY()
-
-        //title toevoegen
-        g.append('text')
-            .attr('y', -40)
-            .text(graphTitle)
 
         //initieren van de x- en yScale
         function setupScales() {
@@ -100,7 +92,6 @@ export function createScatterPlot(array, x, y) {
                 .domain(d3.extent(data, xValue))
                 .range([0, innerWidth])
                 .nice()
-
 
             yScale = d3.scaleLinear()
                 .domain([d3.max(data, yValue), d3.min(data, yValue)])
@@ -173,12 +164,11 @@ export function createScatterPlot(array, x, y) {
                 .attr('r', circleRadius) //circle radius
                 .attr('fill', 'white')
 
-
             //exit selection
             points.exit().remove()
-
         }
 
+        //setup input formulier
         function setupInput(yFields, xFields) {
             d3.select('form')
                 .append('select')
