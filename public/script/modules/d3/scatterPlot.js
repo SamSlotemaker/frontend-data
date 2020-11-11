@@ -149,17 +149,13 @@ export function createScatterPlot(array, x, y) {
             points = points_g.selectAll('circle').data(data)
 
             //update selection
-            points.attr('cy', d => yScale(yValue(d)))
+            points.transition().attr('cy', d => yScale(yValue(d)))
 
             //enter selection
             points = points.enter().append('circle')
                 .on('mouseover', mouseOverEvent)
                 .on('mouseout', mouseOutEvent)
-
-                .attr('cy', d => {
-                    console.log(yScale(yValue(d)))
-                    return yScale(yValue(d))
-                }) //y attribute wordt geset voor ieter item
+                .attr('cy', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
                 .attr('cx', d => xScale(xValue(d))) //x attribute wordt geset voor ieter item
                 .attr('r', circleRadius) //circle radius
                 .attr('fill', 'white')
