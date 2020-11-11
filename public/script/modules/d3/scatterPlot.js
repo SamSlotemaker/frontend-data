@@ -149,6 +149,9 @@ export function createScatterPlot(array, x, y) {
             //call nieuwe Y-as
             yAxisG.call(yAxis)
             yAxisG.selectAll('.domain').remove()
+
+            //update y-as label
+            yAxisG.select('text').text(yVar)
             //selecteer alle circles in parent element 'points_g'
             points = points_g.selectAll('circle').data(data)
 
