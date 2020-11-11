@@ -7,7 +7,13 @@ import * as reverseGeo from './modules/reverseGeo.js'
 import {
     batchData
 } from '../../data/placenameByGeo.js'
+import {
+    vermogenPerGemeente
+} from '../../data/vermogen-gemeentes.js'
 
+//schoon stadsnamen op
+const vermogenPerGemeenteClean = cleanVermogenInfo(vermogenPerGemeente)
+console.log(vermogenPerGemeenteClean)
 
 // API URL variabelen
 const geoVerkoopPuntenURL = 'https://opendata.rdw.nl/resource/cgqw-pfbp.json?$limit=100000&$offset=0'
@@ -46,42 +52,17 @@ allPromises.then(data => {
     //verkrijg alle unieke steden
     const uniqueScatterPlotData = arrayManipulations.uniqueArrayOfObjects(scatterPlotData, 'city')
     //vul een lege array met een object per unieke stad
-    const scatterPlotArray = []
-    uniqueScatterPlotData.forEach(item => {
-        scatterPlotArray.push({
-            city: item
-        })
-    })
-
-    //check voor elk verkooppunt of de stad bestaat in de array van objecten  
-    //zo ja, vul deze met de uurprijs
-    scatterPlotArray.forEach(item => {
-        scatterPlotData.forEach(item2 => {
-            if (item.city == item2.city) {
-                item.gemiddeldeUurPrijs = item2.gemiddeldeUurPrijs
-                item.gemiddeldeGroeiPerJaar = item2.gemiddeldeGroeiPerJaar
-            }
-        })
-    })
-
-    const testObject = []
-    //maak random test object
-    for (let i = 0; i < 200; i++) {
-        testObject.push({
-            vermogen: Math.floor(Math.random() * 200 + 1),
-            groei: Math.floor(Math.random() * 40 + 1)
-        })
-    }
-
-    /*********************************/
-    /***************D3****************/
-    /*********************************/
-    console.log(testObject)
-    console.log(scatterPlotArray)
-    // scatterPlot.createScatterPlot(testObject, 'groei', 'vermogen')
-    scatterPlot.createScatterPlot(scatterPlotArray, 'gemiddeldeGroeiPerJaar', 'gemiddeldeUurPrijs')
+    const useScatterPlotData = formatScatterPlotData(uniqueScatterPlotData, scatterPlotData, vermogenPerGemeenteClean)
+    //create scatterplot in dom
+    // scatterPlot.createScatterPlot(useScatterPlotData, 'gemiddeldeGroeiPerJaar', 'gemiddeldeUurPrijs')
+    // scatterPlot.createScatterPlot(useScatterPlotData, 'gemiddeldeGroeiPerJaar', 'vermogen')
+    scatterPlot.createScatterPlot(useScatterPlotData, 'vermogen', 'gemiddeldeUurPrijs')
 
 })
+
+/*********************************/
+/***************FUNCTIONS*********/
+/*********************************/
 
 //returns promise with data from given url
 export function getData(url) {
@@ -93,6 +74,40 @@ function fillPricePerHour(array) {
     array.forEach(item => {
         item.uurPrijs = calculations.calculatePricePerHour(item.amountfarepart, item.stepsizefarepart)
     })
+}
+
+function cleanVermogenInfo(vermogenPerGemeente) {
+    let vermogenPerGemeente2 = vermogenPerGemeente.map(item => {
+        let gemeente = item.gemeente
+        //vervang haakjes in plaatsnamen
+        let gemeenteGeenHaakjes = gemeente.replace(/\(.*?\)/, "")
+        //vervang spatie op het einde van sommige woorden door het vervangen van haakjes
+        const lastLetter = gemeenteGeenHaakjes.slice(-1)
+        if (lastLetter == ' ') {
+            gemeenteGeenHaakjes = gemeenteGeenHaakjes.substr(0, gemeenteGeenHaakjes.length - 1)
+        }
+
+        let vermogen = item.vermogen
+        console.log(vermogen)
+        vermogen = vermogen.replace(',', '.')
+        console.log(vermogen)
+
+        vermogen = parseFloat(vermogen)
+        console.log(vermogen)
+
+        if (vermogen) {
+            return {
+                gemeente: gemeenteGeenHaakjes,
+                vermogen: vermogen
+            }
+        } else {
+            return {
+                gemeente: gemeenteGeenHaakjes,
+                vermogen: 0
+            }
+        }
+    })
+    return vermogenPerGemeente2
 }
 
 //vul steden doormidden van het checken van lat- en longitude
@@ -132,4 +147,38 @@ function joinObjects(array1, array2, columnNameKey1, columnNameKey2, columnResul
             }
         })
     })
+}
+
+function formatScatterPlotData(uniqueScatterPlotData, scatterPlotData, vermogenPerGemeenteClean) {
+    const scatterPlotArray = []
+    uniqueScatterPlotData.forEach(item => {
+        if (item) {
+            scatterPlotArray.push({
+                city: item
+            })
+        }
+    })
+
+    //check voor elk verkooppunt of de stad bestaat in de array van objecten  
+    //zo ja, vul deze met de gemiddeldes
+    scatterPlotArray.forEach(item => {
+        scatterPlotData.forEach(item2 => {
+            if (item.city == item2.city) {
+                item.gemiddeldeUurPrijs = item2.gemiddeldeUurPrijs
+                item.gemiddeldeGroeiPerJaar = item2.gemiddeldeGroeiPerJaar
+            }
+        })
+        vermogenPerGemeenteClean.forEach(vermogenInfo => {
+            if (item.city == vermogenInfo.gemeente) {
+                item.vermogen = vermogenInfo.vermogen
+            }
+        })
+    })
+    //wanneer vermogen niet bekend is, zet deze op 0
+    scatterPlotArray.forEach(item => {
+        if (!item.hasOwnProperty('vermogen')) {
+            item.vermogen = 0;
+        }
+    })
+    return scatterPlotArray
 }

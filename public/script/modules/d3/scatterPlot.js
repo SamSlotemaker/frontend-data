@@ -31,10 +31,15 @@ svg.append("defs").append("clipPath")
     .attr("width", innerWidth)
     .attr("height", innerHeight);
 
+
+
+
 export function createScatterPlot(array, x, y) {
     //callback functions die loopen over de waardes
     const xValue = d => d[x]
     const yValue = d => d[y]
+
+
 
     //render de chart
     const renderBarChart = data => {
@@ -44,17 +49,24 @@ export function createScatterPlot(array, x, y) {
                 [0, 0],
                 [width, height]
             ])
-            .on("zoom", zoomed);
+            .on("zoom", zoomed)
+        let xFields = ['nummers', 'getalletjes']
 
+
+        svg.call(zoom);
         //maak schaal aan voor assen
         const xScale = d3.scaleLinear()
             .domain(d3.extent(data, xValue))
             .range([0, innerWidth])
             .nice()
+
+
         const yScale = d3.scaleLinear()
             .domain([d3.max(data, yValue), d3.min(data, yValue)])
             .range([0, innerHeight])
             .nice()
+
+        setupInput(xFields)
 
         //creeer groep voor grafiek
         const g = svg.append('g')
@@ -108,25 +120,62 @@ export function createScatterPlot(array, x, y) {
             .attr("clip-path", "url(#clip)")
             .classed("points_g", true);
 
-        //selecteer alle rectangles in parent element 'g'
+        //selecteer alle circles in parent element 'points_g'
         var points = points_g.selectAll('circle').data(data)
-        points = points.enter().append('circle') //voeg rectangles toe wanneer deze niet bestaan
-            .attr('cy', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
-            .attr('cx', d => xScale(xValue(d))) //height wordt betpaald en geset voor ieder item
-            .attr('r', circleRadius)
-            .attr('fill', 'white')
+
+        points = points.enter().append('circle')
             .on('mouseover', mouseOverEvent)
             .on('mouseout', mouseOutEvent)
+            .attr('cy', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
+            .attr('cx', d => xScale(xValue(d))) //x attribute wordt geset voor ieter item
+            .attr('r', circleRadius) //circle radius
+            .attr('fill', 'white')
 
+        //verwijder overige bolletjes
+        points.exit().remove()
+
+
+        //title toevoegen
         g.append('text')
             .attr('y', -40)
             .text(graphTitle)
-        //call zoom function op de svg
-        svg.call(zoom);
+
+
+        function selectionChangedY() {
+            //'this' refers to the form element!
+            console.log("Changing y axis to reflect this variable", this.value)
+            // Update the domain to reflect the currently selected variable
+            yScale.domain([d3.max(data, yValue), d3.min(data, yValue)])
+            //Update the bars to reflect their new height
+            var points = points_g.selectAll('circle').data(data)
+
+
+            points = points.enter().append('circle')
+                .on('mouseover', mouseOverEvent)
+                .on('mouseout', mouseOutEvent)
+                //voeg rectangles toe wanneer deze niet bestaan
+                .attr('cy', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
+                .attr('cx', d => xScale(xValue(d))) //height wordt betpaald en geset voor ieder item
+                .attr('r', circleRadius)
+                .attr('fill', 'white')
+            yAxisG.call(yAxis)
+        }
+
+        function setupInput(yFields, xFields) {
+            d3.select('form')
+                .append('select')
+                .text("Select a text value")
+                .on('change', selectionChangedY)
+                .selectAll('option')
+                .data(yFields)
+                .enter()
+                .append('option')
+                .attr('value', d => d)
+                .text(d => "y-axis variable: " + d)
+        }
 
         //zoomed wordt uitgevoerd op het scrollevent
         function zoomed(e) {
-            console.log('zooom')
             // create new scale ojects based on event
             var new_xScale = e.transform.rescaleX(xScale);
             var new_yScale = e.transform.rescaleY(yScale);
