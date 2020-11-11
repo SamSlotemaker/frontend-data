@@ -61,65 +61,23 @@ export function createScatterPlot(array, x, y) {
 
 
         svg.call(zoom);
-        //maak schaal aan voor assen
-        const xScale = d3.scaleLinear()
-            .domain(d3.extent(data, xValue))
-            .range([0, innerWidth])
-            .nice()
 
-
-        const yScale = d3.scaleLinear()
-            .domain([d3.max(data, yValue), d3.min(data, yValue)])
-            .range([0, innerHeight])
-            .nice()
-
-        setupInput(yFields)
+        //globale variabelen voor functies
+        let xScale;
+        let yScale;
+        let xAxis;
+        let yAxis;
+        let yAxisG;
+        let xAxisG;
 
         //creeer groep voor grafiek
         const g = svg.append('g')
             .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
-        const xAxisTickFormat = number => d3.format('')(number)
+        setupScales()
+        setupInput(yFields)
+        setupAxis()
 
-        //creer as an onderkant
-        const xAxis = d3.axisBottom(xScale)
-            .tickFormat(xAxisTickFormat)
-            .tickSize(-innerHeight)
-            .tickPadding(15)
-
-        //creer as an zijkant
-        const yAxis = d3.axisLeft(yScale)
-            .tickSize(-innerWidth)
-            .tickPadding(15)
-
-        //voeg groep toe en creer xas label
-        const yAxisG = g.append('g')
-
-
-        //toevoegen van label aan Y-as
-        yAxisG.append('text')
-            .attr('fill', 'white')
-            .attr('class', 'axis-label')
-            .attr('transform', `rotate(-90)`)
-            .text(yVar)
-            .attr('y', -50)
-            .attr('x', -innerHeight / 2)
-            .attr('text-anchor', 'middle')
-
-        //voeg groep toe en creer yas label
-        const xAxisG = g.append('g')
-            .call(xAxis)
-        xAxisG
-            .attr('transform', `translate(0, ${innerHeight})`)
-            .selectAll('.domain').remove()
-
-        //toevoegen van legenda aan X-as
-        xAxisG.append('text')
-            .attr('y', 50)
-            .attr('x', innerWidth / 2)
-            .attr('fill', 'white')
-            .attr('class', 'axis-label')
-            .text(xVar)
 
         //creer aparte groep voor de getekende punten met een clip path
         var points_g = g.append("g")
@@ -136,13 +94,68 @@ export function createScatterPlot(array, x, y) {
             .attr('y', -40)
             .text(graphTitle)
 
-        function selectionChangedY() {
-            //this is the form element
-            yVar = this ? this.value : yVar
-            console.log(yVar)
-            console.log(d3.max(data, yValue))
-            yScale.domain([d3.max(data, yValue), 0])
+        //initieren van de x- en yScale
+        function setupScales() {
+            xScale = d3.scaleLinear()
+                .domain(d3.extent(data, xValue))
+                .range([0, innerWidth])
+                .nice()
 
+
+            yScale = d3.scaleLinear()
+                .domain([d3.max(data, yValue), d3.min(data, yValue)])
+                .range([0, innerHeight])
+                .nice()
+        }
+
+        //initieren van de x- en yAxis
+
+        function setupAxis() {
+            xAxis = d3.axisBottom(xScale)
+                .tickSize(-innerHeight)
+                .tickPadding(15)
+
+            //creer as an zijkant
+            yAxis = d3.axisLeft(yScale)
+                .tickSize(-innerWidth)
+                .tickPadding(15)
+
+            //voeg groep toe en creer xas label
+            yAxisG = g.append('g')
+
+            //toevoegen van label aan Y-as
+            yAxisG.append('text')
+                .attr('fill', 'white')
+                .attr('class', 'axis-label')
+                .attr('transform', `rotate(-90)`)
+                .text(yVar)
+                .attr('y', -50)
+                .attr('x', -innerHeight / 2)
+                .attr('text-anchor', 'middle')
+
+            //voeg groep toe en creer yas label
+            xAxisG = g.append('g')
+                .call(xAxis)
+            xAxisG
+                .attr('transform', `translate(0, ${innerHeight})`)
+                .selectAll('.domain').remove()
+
+            //toevoegen van legenda aan X-as
+            xAxisG.append('text')
+                .attr('y', 50)
+                .attr('x', innerWidth / 2)
+                .attr('fill', 'white')
+                .attr('class', 'axis-label')
+                .text(xVar)
+        }
+
+        //wordt aangeroepen wanneer select element veranderd
+        function selectionChangedY() {
+            //this is the form element, zet naar standaard wanneer er geen change is uitgevoerd (eerste keer)
+            yVar = this ? this.value : yVar
+            yScale.domain([d3.max(data, yValue), 0]) //nieuw domain maken
+
+            //call nieuwe Y-as
             yAxisG.call(yAxis)
             yAxisG.selectAll('.domain').remove()
             //selecteer alle circles in parent element 'points_g'

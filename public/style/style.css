@@ -19,26 +19,26 @@ body {
     place-items: center;
 }
 
-#svg-container>div {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    width: 80%;
-    color: white
-}
 
-#svg-container>div>div {
-    min-width: 21em;
-    margin: 1em;
-}
+
 
 circle {
     opacity: .8;
 }
 
 form {
+
     color: white;
+    display: flex;
+    margin: auto;
+    width: 30em;
+    margin-top: 2em;
+    justify-content: space-between;
+}
+
+form select {
+    margin-left: 1em;
+    flex-grow: 1;
 }
 
 #svg-container>div>div button {
