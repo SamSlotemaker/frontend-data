@@ -88,13 +88,8 @@ function cleanVermogenInfo(vermogenPerGemeente) {
         }
 
         let vermogen = item.vermogen
-        console.log(vermogen)
         vermogen = vermogen.replace(',', '.')
-        console.log(vermogen)
-
         vermogen = parseFloat(vermogen)
-        console.log(vermogen)
-
         if (vermogen) {
             return {
                 gemeente: gemeenteGeenHaakjes,

@@ -19,8 +19,6 @@ const margin = {
     left: 140
 }
 
-let yVar = "gemiddeldeUurPrijs"
-let xVar = "gemiddeldeGroeiPerJaar"
 
 //bereken maximale lengtes van grafiek
 const innerWidth = width - margin.left - margin.right
@@ -37,7 +35,10 @@ svg.append("defs").append("clipPath")
 
 
 
-export function createScatterPlot(array) {
+export function createScatterPlot(array, x, y) {
+    let yVar = y
+    let xVar = x
+
     //callback functions die loopen over de waardes
     const xValue = d => d[xVar]
     const yValue = d => d[yVar]
@@ -93,8 +94,7 @@ export function createScatterPlot(array) {
 
         //voeg groep toe en creer xas label
         const yAxisG = g.append('g')
-            .call(yAxis)
-        yAxisG.selectAll('.domain').remove()
+
 
         //toevoegen van label aan Y-as
         yAxisG.append('text')
@@ -126,8 +126,7 @@ export function createScatterPlot(array) {
             .attr("clip-path", "url(#clip)")
             .classed("points_g", true);
 
-        //selecteer alle circles in parent element 'points_g'
-        var points = points_g.selectAll('circle').data(data)
+        var points;
 
         //roep 1 keer aan bij laden grafiek
         selectionChangedY()
@@ -141,18 +140,34 @@ export function createScatterPlot(array) {
             //this is the form element
             yVar = this ? this.value : yVar
             console.log(yVar)
+            console.log(d3.max(data, yValue))
+            yScale.domain([d3.max(data, yValue), 0])
 
-            yScale.domain()
+            yAxisG.call(yAxis)
+            yAxisG.selectAll('.domain').remove()
+            //selecteer alle circles in parent element 'points_g'
+            points = points_g.selectAll('circle').data(data)
+
+            //update selection
+            points.attr('cy', d => yScale(yValue(d)))
+
+            //enter selection
             points = points.enter().append('circle')
                 .on('mouseover', mouseOverEvent)
                 .on('mouseout', mouseOutEvent)
-                .attr('cy', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
+
+                .attr('cy', d => {
+                    console.log(yScale(yValue(d)))
+                    return yScale(yValue(d))
+                }) //y attribute wordt geset voor ieter item
                 .attr('cx', d => xScale(xValue(d))) //x attribute wordt geset voor ieter item
                 .attr('r', circleRadius) //circle radius
                 .attr('fill', 'white')
 
-            //verwijder overige bolletjes
+
+            //exit selection
             points.exit().remove()
+
         }
 
         function setupInput(yFields, xFields) {
