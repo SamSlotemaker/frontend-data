@@ -54,9 +54,9 @@ allPromises.then(data => {
     //vul een lege array met een object per unieke stad
     const useScatterPlotData = formatScatterPlotData(uniqueScatterPlotData, scatterPlotData, vermogenPerGemeenteClean)
     //create scatterplot in dom
-    // scatterPlot.createScatterPlot(useScatterPlotData, 'gemiddeldeGroeiPerJaar', 'gemiddeldeUurPrijs')
+    scatterPlot.createScatterPlot(useScatterPlotData, 'gemiddeldeGroeiPerJaar', 'gemiddeldeUurPrijs')
     // scatterPlot.createScatterPlot(useScatterPlotData, 'gemiddeldeGroeiPerJaar', 'vermogen')
-    scatterPlot.createScatterPlot(useScatterPlotData, 'vermogen', 'gemiddeldeUurPrijs')
+    // scatterPlot.createScatterPlot(useScatterPlotData, 'vermogen', 'gemiddeldeUurPrijs')
 
 })
 

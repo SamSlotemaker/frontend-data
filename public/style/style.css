@@ -37,6 +37,10 @@ circle {
     opacity: .8;
 }
 
+form {
+    color: white;
+}
+
 #svg-container>div>div button {
     border: none;
     color: black;

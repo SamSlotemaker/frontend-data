@@ -50,7 +50,11 @@ export function createScatterPlot(array, x, y) {
                 [width, height]
             ])
             .on("zoom", zoomed)
-        let xFields = ['nummers', 'getalletjes']
+
+        console.log(Object.getOwnPropertyNames(data[0]))
+        let propertyNames = Object.getOwnPropertyNames(data[0])
+        let propertyNamesWithoutCity = propertyNames.slice(1, 4)
+        let yFields = propertyNamesWithoutCity
 
 
         svg.call(zoom);
@@ -66,7 +70,7 @@ export function createScatterPlot(array, x, y) {
             .range([0, innerHeight])
             .nice()
 
-        setupInput(xFields)
+        setupInput(yFields)
 
         //creeer groep voor grafiek
         const g = svg.append('g')
@@ -141,37 +145,17 @@ export function createScatterPlot(array, x, y) {
             .text(graphTitle)
 
 
-        function selectionChangedY() {
-            //'this' refers to the form element!
-            console.log("Changing y axis to reflect this variable", this.value)
-            // Update the domain to reflect the currently selected variable
-            yScale.domain([d3.max(data, yValue), d3.min(data, yValue)])
-            //Update the bars to reflect their new height
-            var points = points_g.selectAll('circle').data(data)
-
-
-            points = points.enter().append('circle')
-                .on('mouseover', mouseOverEvent)
-                .on('mouseout', mouseOutEvent)
-                //voeg rectangles toe wanneer deze niet bestaan
-                .attr('cy', d => yScale(yValue(d))) //y attribute wordt geset voor ieter item
-                .attr('cx', d => xScale(xValue(d))) //height wordt betpaald en geset voor ieder item
-                .attr('r', circleRadius)
-                .attr('fill', 'white')
-            yAxisG.call(yAxis)
-        }
-
         function setupInput(yFields, xFields) {
             d3.select('form')
                 .append('select')
                 .text("Select a text value")
-                .on('change', selectionChangedY)
+                // .on('change', selectionChangedY)
                 .selectAll('option')
                 .data(yFields)
                 .enter()
                 .append('option')
                 .attr('value', d => d)
-                .text(d => "y-axis variable: " + d)
+                .text(d => "Y-as: " + d)
         }
 
         //zoomed wordt uitgevoerd op het scrollevent
