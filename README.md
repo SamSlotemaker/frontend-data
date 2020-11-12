@@ -128,7 +128,10 @@ npm install
 ```
 npm start
 ```
-4. Open project in browser on port 8000
+4. Open project in browser op port 8000
+```
+localhost:8000
+```
 
 
 ## :heart: Aknowledgement
