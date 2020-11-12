@@ -12,7 +12,7 @@ Voor mijn volledige proces kun je naar de Wiki navigeren, waar ik mijn proces en
 https://github.com/SamSlotemaker/frontend-data/wiki
 
 #### Week 1
-![gif](public/style/images/colors.gif)
+![gif](public/style/images/colors.gif)     
 Het resultaat van week 1 is te vinden op github pages
 https://samslotemaker.github.io/functional-programming/SURVEYdata/dataOpschonen/public/index.html
 
