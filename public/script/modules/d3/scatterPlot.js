@@ -196,7 +196,7 @@ export function createScatterPlot(array, x, y) {
         function zoomed(e) {
             //create max transform distance, snap back when dragged too far
             checkMaxDragDistance(e)
-            // create new scale ojects based on event
+            // create new scale objects based on event
             var new_xScale = e.transform.rescaleX(xScale);
             var new_yScale = e.transform.rescaleY(yScale);
             // update axes
@@ -206,9 +206,7 @@ export function createScatterPlot(array, x, y) {
             points = points_g.selectAll('circle').data(data)
             points
                 .attr('cx', (d) => new_xScale(xValue(d)))
-                .attr('cy', function (d) {
-                    return new_yScale(yValue(d))
-                });
+                .attr('cy', (d) => new_yScale(yValue(d)));
         }
 
         //maximale drag distance waarna de grafiek terugschiet naar een begint punt
