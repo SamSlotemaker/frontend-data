@@ -215,8 +215,8 @@ export function createScatterPlot(array, x, y) {
             //voel label toe met id om later te verwijderen
             svg.append('text')
                 .attr('id', "t" + id)
-                .attr('x', d.pageX - 30)
-                .attr('y', d.pageY - 50)
+                .attr('x', d.pageX - 60)
+                .attr('y', d.pageY - 60)
                 .text(i.city)
         }
 
