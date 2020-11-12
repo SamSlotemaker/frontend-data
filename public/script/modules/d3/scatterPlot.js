@@ -145,6 +145,7 @@ export function createScatterPlot(array, x, y) {
             //this is the form element, zet naar standaard wanneer er geen change is uitgevoerd (eerste keer)
             yVar = this ? this.value : yVar
             yScale.domain([d3.max(data, yValue), 0]) //nieuw domain maken
+            console.log(yVar)
 
             //call nieuwe Y-as
             yAxisG.call(yAxis)
@@ -195,7 +196,8 @@ export function createScatterPlot(array, x, y) {
             xAxisG.call(xAxis.scale(new_xScale));
             yAxisG.call(yAxis.scale(new_yScale));
             //update points
-            points.data(data)
+            points = points_g.selectAll('circle').data(data)
+            points
                 .attr('cx', (d) => new_xScale(xValue(d)))
                 .attr('cy', function (d) {
                     return new_yScale(yValue(d))

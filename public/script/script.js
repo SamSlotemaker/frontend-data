@@ -6,10 +6,10 @@ import * as scatterPlot from './modules/d3/scatterPlot.js'
 import * as reverseGeo from './modules/reverseGeo.js'
 import {
     batchData
-} from '../../data/placenameByGeo.js'
+} from '../data/placenameByGeo.js'
 import {
     vermogenPerGemeente
-} from '../../data/vermogen-gemeentes.js'
+} from '../data/vermogen-gemeentes.js'
 
 //schoon stadsnamen op
 const vermogenPerGemeenteClean = cleanVermogenInfo(vermogenPerGemeente)

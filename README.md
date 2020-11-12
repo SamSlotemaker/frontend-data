@@ -1,4 +1,4 @@
-# functional-programming
+# frontend-data
 ![picture of data visualisatoin](https://i.pinimg.com/originals/2e/e6/99/2ee6998e34c3e2eff7b894c66cfc5267.jpg)
 
 ## :grey_question: Beschrijving
@@ -9,10 +9,10 @@ De opdracht is het maken van een verhalende visualisatie voor de Volkskrant, met
 
 ### Proces
 Voor mijn volledige proces kun je naar de Wiki navigeren, waar ik mijn proces en denkwijze documenteer
-https://github.com/SamSlotemaker/functional-programming/wiki
+https://github.com/SamSlotemaker/frontend-data/wiki
 
 #### Week 1
-![gif](SURVEYdata/colors.gif)
+![gif](public/style/images/colors.gif)
 Het resultaat van week 1 is te vinden op github pages
 https://samslotemaker.github.io/functional-programming/SURVEYdata/dataOpschonen/public/index.html
 
@@ -66,16 +66,35 @@ _beschikbare data:_
 
 Om mijn concept uit te werken wil ik alle geolocaties omzetten naar plaatsnamen. Hiermee kan ik met alle uurprijzen een gemiddelde prijs bepalen per plaats en op deze manier de prijzen, vermogens en vernieuwing samenvoegen.
 
+## Visualisatie
+Een scatterplot waar verbanden ontdekt kunnen worden tussen de groei in parkeervernieuwing en vermogen/gemiddelde uurprijs per stad
+https://samslotemaker.github.io/frontend-data/public/index.html
+![Imgur](https://imgur.com/WYEXc1r.png)
 
+### Voorbeeld
+De visualisatie is ontwikkeld vanuit een voorbeeld van Curren
+https://vizhub.com/curran/9247d4d42df74185980f7b1f7504dcc5
+![Imgur](https://imgur.com/PyTIbyw.png)
 ## :gear: Installation
 1. Clone deze repository
 ```
-git clone https://github.com/SamSlotemaker/functional-programming.git
+git clone https://github.com/SamSlotemaker/frontend-data.git
 ```
-2. open het project op een live server
+2. Installeer npm packages
+```
+npm install
+```
+3. Run live server
+```
+npm start
+```
+4. Open project in browser on port 8000
+
 
 ## :heart: Aknowledgement
 * StackOverflow voor bug fixes
 * Medium voor aanvullende informatie
-* HvA Tech-Track docenten
-* Medestudenten
+* Curran Kelleher
+* D3 documentatie https://github.com/d3
+* HvA Tech-Track docenten: Laurens Aarnoudse, Danny de Vries, Robert Spier
+* Medestudenten (Support groep 7 in het bijzonder)
