@@ -240,7 +240,20 @@ export function createScatterPlot(array, x, y) {
             } else {
                 pixelOffsetY = 60;
             }
+            //toevoegen van labels op hover
+            addHoverLabels(d, i, id)
+        }
+        //mouseout event
+        function mouseOutEvent(d, i) {
+            //verwijder alle niet letter en numerieke charachters als id's
+            let city = i.city;
+            let id = city.replace(/[\W_]+/g, "");
+            d3.select(this).transition().attr('r', circleRadius) //radius naar normaal
+                .attr('fill', 'white')
+            removeHoverLabels(d, id)
+        }
 
+        function addHoverLabels(d, i, id) {
             //toevoegen hover informatie
             svg.append('text')
                 .attr('id', "t" + id)
@@ -264,13 +277,7 @@ export function createScatterPlot(array, x, y) {
                 .text(`gemiddelde groei per jaar: ${i.gemiddeldeGroeiPerJaar}`)
         }
 
-        //mouseout event
-        function mouseOutEvent(d, i) {
-            //verwijder alle niet letter en numerieke charachters als id's
-            let city = i.city;
-            let id = city.replace(/[\W_]+/g, "");
-            d3.select(this).transition().attr('r', circleRadius) //radius naar normaal
-                .attr('fill', 'white')
+        function removeHoverLabels(d, id) {
             d3.select("#t" + id).remove() //verwijder toegevoegd label
             d3.select("#t" + id + '1').remove() //verwijder toegevoegd label
             d3.select("#t" + id + '2').remove() //verwijder toegevoegd label
