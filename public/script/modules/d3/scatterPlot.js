@@ -58,13 +58,11 @@ export function createScatterPlot(array, x, y) {
                 [width, height]
             ])
             .on("zoom", zoomed)
-
+        svg.call(zoom);
         //haal propertynames uit de data voor de filteropties
         let propertyNames = Object.getOwnPropertyNames(data[0])
         let propertyNamesWithoutCity = propertyNames.slice(1, 4)
         let yFields = propertyNamesWithoutCity
-        //call zoom op de parent svg voor de zoom functionaliteit
-        svg.call(zoom);
 
 
         //creeer groep voor grafiek
@@ -147,6 +145,7 @@ export function createScatterPlot(array, x, y) {
         function selectionChangedY() {
             //this is the form element, zet naar standaard wanneer er geen change is uitgevoerd (eerste keer)
 
+            //verwijder een bestaande error message
             d3.select('.error').remove()
 
             yVar = this ? this.value : yVar
