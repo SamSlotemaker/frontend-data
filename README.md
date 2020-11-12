@@ -76,7 +76,7 @@ https://github.com/SamSlotemaker/frontend-data/wiki/4.1-Concept#schets-visualisa
 sellingpointid: "8711",
 startdatesellingpoint: "20180604", 
 sellingpointdesc: "Parkeerterrein Didamsestraat", 
-location: {latitude: "51.928164446", longitude: "6.078784008"}
+location: {latitude: "51.928164446", longitude: "6.078784008"},
 sellingpointdesc: "Parkeerterrein Didamsestraat",
 sellingpointid: "8711",
 startdatesellingpoint: "20180604"}
@@ -132,9 +132,26 @@ npm start
 
 
 ## :heart: Aknowledgement
-* StackOverflow voor bug fixes
-* Medium voor aanvullende informatie
-* Curran Kelleher
-* D3 documentatie https://github.com/d3
 * HvA Tech-Track docenten: Laurens Aarnoudse, Danny de Vries, Robert Spier
 * Medestudenten (Support groep 7 in het bijzonder)
+* Dataset, van https://opendata.rdw.nl/browse?category=Parkeren&provenance=official, geraadpleegd op 19 oktober 2020.
+* CVS naar JSON, van https://csvjson.com/csv2json, geraadpleegd op 21 oktober 2020.
+* Remove spaces, van https://stackoverflow.com/questions/5963182/, geraadpleegd op 21 oktober 2020.how-to-remove-spaces-from-a-string-using-javascript, geraadpleegd op 20 oktober 2020.
+* regex test(), van https://www.w3schools.com/jsref/jsref_regexp_test.asp, geraadpleegd op 22 oktober 2020.
+* Valide hex check, van https://stackoverflow.com/questions/8027423/how-to-check-if-a-string-is-a-valid-hex-color-representation/8027444, geraadpleegd op 22 oktober 2020.
+* YIQ calculator, van https://medium.com/@druchtie/contrast-calculator-with-yiq-5be69e55535c, geraadpleegd op 23 oktober 2020.
+* Array cloning, van https://www.samanthaming.com/tidbits/35-es6-way-to-clone-an-array/, geraadpleegd op 23 oktober 2020.
+* Fetch, van https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch, geraadpleegd op 26 oktober 2020.
+* Promises, van https://www.youtube.com/watch?v=DHvZLI7Db8E, geraadpleegd op 27 oktober 2020.
+* Paging through data, van https://dev.socrata.com/docs/paging.html, geraadpleegd op 27 oktober 2020.
+* Promise.all(), van https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all, geraadpleegd op 28 oktober 2020.
+* Promise.all(), van https://medium.com/jeremy-gottfrieds-tech-blog/promise-all-a-helpful-tool-for-async-js-6cf8bf6ed2b7, geraadpleegd op 28 oktober 2020.
+* Reverse geocoding, van https://apidocs.geoapify.com/docs/geocoding/getting-started/geocoding, geraadpleegd op 30 oktober 2020.
+* JSON lokaal opslaan, van https://stackoverflow.com/questions/34156282/how-do-i-save-json-to-local-text-file, geraadpleegd op 2 november 2020.
+* Reverse batch geocoding (door Laurens), van https://apidocs.geoapify.com/docs/batch/getting-started/about, geraadpleegd op 6 november 2020.
+* D3 documentatie https://github.com/d3, geraadpleegd op 1 november 2020.
+* Making a bar chart https://www.youtube.com/watch?v=NlBt-7PuaLk, geraadpleegd op 1 november 2020.
+* Making a scatter plot https://www.youtube.com/watch?v=M2s2jowLkUo&t=2s, geraadpleegd op 6 november 2020.
+* Customizing axis https://www.youtube.com/watch?v=c3MCROTNN8g&list=PL9yYRbwpkykvOXrZumtZWbuaXWHvjD8gi&index=9, geraadpleegd op 7 november 2020.
+* D3 Semantic zooming, van https://bl.ocks.org/aleereza/d2be3d62a09360a770b79f4e5527eea8, geraadpleegd op 9 november 2020.
+
