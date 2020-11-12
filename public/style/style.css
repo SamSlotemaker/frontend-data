@@ -19,6 +19,12 @@ body {
     place-items: center;
 }
 
+.error {
+    margin-top: 0.3em;
+    width: 100%;
+    color: rgb(158, 13, 13);
+    font-size: 1em;
+}
 
 .loading {
     position: absolute;
@@ -49,6 +55,7 @@ circle {
 form {
     color: white;
     display: flex;
+    flex-wrap: wrap;
     margin: auto;
     width: 30em;
     margin-top: 2em;

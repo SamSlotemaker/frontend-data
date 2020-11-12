@@ -146,7 +146,17 @@ export function createScatterPlot(array, x, y) {
         //wordt aangeroepen wanneer select element veranderd
         function selectionChangedY() {
             //this is the form element, zet naar standaard wanneer er geen change is uitgevoerd (eerste keer)
+
+            d3.select('.error').remove()
+
             yVar = this ? this.value : yVar
+            //geef een error message wanneer de gekozen Y-as gelijk is aan de X-as
+            if (yVar == xVar) {
+                d3.select('form').append('text')
+                    .text('Het heeft weinig zin om dezelfde assen te kiezen!')
+                    .classed('error', true)
+                return;
+            }
             yScale.domain([d3.max(data, yValue), 0]) //nieuw domain maken
 
             //call nieuwe Y-as
