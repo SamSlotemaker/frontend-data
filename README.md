@@ -66,7 +66,11 @@ _beschikbare data:_
 
 Om mijn concept uit te werken wil ik alle geolocaties omzetten naar plaatsnamen. Hiermee kan ik met alle uurprijzen een gemiddelde prijs bepalen per plaats en op deze manier de prijzen, vermogens en vernieuwing samenvoegen.
 
-## Voorbeeld objecten verkregen data
+### Concept schetsen
+https://github.com/SamSlotemaker/frontend-data/wiki/4.1-Concept#schets-visualisatie
+
+## Data
+### Voorbeeld objecten verkregen data
 ```js
 {areamanagerid: "299",
 sellingpointid: "8711",
@@ -91,12 +95,16 @@ stepsizefarepart: "4",
 }
 ```
 
-## Getransformeerd data object
+### Getransformeerd data object
 ```js
 {city: "Zevenaar", gemiddeldeUurPrijs: 0.9000000000000002, gemiddeldeGroeiPerJaar: 16, vermogen: 34.8}
 ```
 Het gedetailleerde proces vind je in mijn wiki
 https://github.com/SamSlotemaker/frontend-data/wiki/Data-transformation
+
+### Lege waardes
+Bij lege of invalide waarde in de coordinaten/plaatsnaam wordt het object volledig genegeerd. Ik kan in mijn geval niks met een onbekende plek. 
+Lege/invalide waardes bij groei, vermogen of uurprijs worden op 0 gezet. Op deze manier kunnen er alsnog andere vergelijkingen gedaan worden. Ook kunnen lege waardes bij groei en uurprijs betekenen dat er daatwerkelijk geen groei is of het parkeren gratis is. 
 
 ## Visualisatie
 Een scatterplot waar verbanden ontdekt kunnen worden tussen de groei in parkeervernieuwing en vermogen/gemiddelde uurprijs per stad
