@@ -228,7 +228,7 @@ export function createScatterPlot(array, x, y) {
                 pixelOffsetY = 60;
             }
 
-
+            //toevoegen hover informatie
             svg.append('text')
                 .attr('id', "t" + id)
                 .attr('x', d.pageX - pixelOffsetX)

@@ -66,10 +66,42 @@ _beschikbare data:_
 
 Om mijn concept uit te werken wil ik alle geolocaties omzetten naar plaatsnamen. Hiermee kan ik met alle uurprijzen een gemiddelde prijs bepalen per plaats en op deze manier de prijzen, vermogens en vernieuwing samenvoegen.
 
+## Voorbeeld objecten verkregen data
+```js
+{areamanagerid: "299",
+sellingpointid: "8711",
+startdatesellingpoint: "20180604", 
+sellingpointdesc: "Parkeerterrein Didamsestraat", 
+location: {latitude: "51.928164446", longitude: "6.078784008"}
+sellingpointdesc: "Parkeerterrein Didamsestraat",
+sellingpointid: "8711",
+startdatesellingpoint: "20180604"}
+```
+
+```js
+{amountcumulative: "0",
+amountfarepart: "0",
+areamanagerid: "34",
+enddatefarepart: "20170102",
+enddurationfarepart: "4",
+farecalculationcode: "BEZVGBZ",
+startdatefarepart: "20161101",
+startdurationfarepart: "0",
+stepsizefarepart: "4",
+}
+```
+
+## Getransformeerd data object
+```js
+{city: "Zevenaar", gemiddeldeUurPrijs: 0.9000000000000002, gemiddeldeGroeiPerJaar: 16, vermogen: 34.8}
+```
+Het gedetailleerde proces vind je in mijn wiki
+https://github.com/SamSlotemaker/frontend-data/wiki/Data-transformation
+
 ## Visualisatie
 Een scatterplot waar verbanden ontdekt kunnen worden tussen de groei in parkeervernieuwing en vermogen/gemiddelde uurprijs per stad
 https://samslotemaker.github.io/frontend-data/public/index.html
-![Imgur](https://imgur.com/WYEXc1r.png)
+![Imgur](https://imgur.com/L9JMv3Y.png)
 
 ### Voorbeeld
 De visualisatie is ontwikkeld vanuit een voorbeeld van Curren
