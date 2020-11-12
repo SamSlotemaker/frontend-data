@@ -28,6 +28,7 @@ const tariefdeelURL = 'https://opendata.rdw.nl/resource/534e-5vdg.json?$limit=10
 const verkoopPunten = getData(geoVerkoopPuntenURL);
 const tariefDeel = getData(tariefdeelURL)
 
+
 //kolomnamen
 const areamanageridKolom = 'areamanagerid'
 const uurPrijsKolom = 'uurPrijs'
@@ -43,6 +44,8 @@ const allPromises = Promise.all([verkoopPunten, tariefDeel]).then(res => {
 
 //wanneer data vertaald is naar json:
 allPromises.then(data => {
+
+
     //ophalen arrays uit de data
     const verkoopPuntenArray = data[0]; //array met verkooppunten
     const tariefDeelArray = data[1] //array met prijs informatie

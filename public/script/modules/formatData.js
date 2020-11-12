@@ -26,12 +26,12 @@ export function cleanVermogenInfo(vermogenPerGemeente) {
         if (vermogen) {
             return {
                 gemeente: gemeenteGeenHaakjes,
-                vermogen: vermogen
+                GemiddeldVermogenPlaats: vermogen
             }
         } else {
             return {
                 gemeente: gemeenteGeenHaakjes,
-                vermogen: 0
+                GemiddeldVermogenPlaats: 0
             }
         }
     })
@@ -87,26 +87,27 @@ export function formatScatterPlotData(uniqueScatterPlotData, scatterPlotData, ve
             })
         }
     })
-
     //check voor elk verkooppunt of de stad bestaat in de array van objecten  
     //zo ja, vul deze met de gemiddeldes
     scatterPlotArray.forEach(item => {
         scatterPlotData.forEach(item2 => {
             if (item.city == item2.city) {
-                item.gemiddeldeUurPrijs = item2.gemiddeldeUurPrijs
-                item.gemiddeldeGroeiPerJaar = item2.gemiddeldeGroeiPerJaar
+                item.gemiddeldeUurPrijs = item2.gemiddeldeUurPrijs.toFixed(2)
+                item.gemiddeldeGroeiPerJaar = item2.gemiddeldeGroeiPerJaar.toFixed(2)
             }
         })
+
+
         vermogenPerGemeenteClean.forEach(vermogenInfo => {
             if (item.city == vermogenInfo.gemeente) {
-                item.vermogen = vermogenInfo.vermogen
+                item.GemiddeldVermogenPlaats = vermogenInfo.GemiddeldVermogenPlaats
             }
         })
     })
     //wanneer vermogen niet bekend is, zet deze op 0
     scatterPlotArray.forEach(item => {
-        if (!item.hasOwnProperty('vermogen')) {
-            item.vermogen = 0;
+        if (!item.hasOwnProperty('GemiddeldVermogenPlaats')) {
+            item.GemiddeldVermogenPlaats = 0;
         }
     })
     return scatterPlotArray

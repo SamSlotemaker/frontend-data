@@ -26,6 +26,9 @@ const margin = {
     bottom: 80,
     left: 140
 }
+const pixelStep = "18"
+let pixelOffsetY;
+let pixelOffsetX;
 
 //bereken maximale lengtes van grafiek
 const innerWidth = width - margin.left - margin.right
@@ -145,7 +148,6 @@ export function createScatterPlot(array, x, y) {
             //this is the form element, zet naar standaard wanneer er geen change is uitgevoerd (eerste keer)
             yVar = this ? this.value : yVar
             yScale.domain([d3.max(data, yValue), 0]) //nieuw domain maken
-            console.log(yVar)
 
             //call nieuwe Y-as
             yAxisG.call(yAxis)
@@ -213,11 +215,40 @@ export function createScatterPlot(array, x, y) {
             d3.select(this).transition().attr('r', circleRadius * 2)
                 .attr('fill', 'orangered')
             //voel label toe met id om later te verwijderen
+
+            //verplaats hover informatie naar linksboven wanneer je je op de rand van de grafiek bevindt
+            if (d.pageX > containerWidth - containerWidth / 4) {
+                pixelOffsetX = 260;
+            } else {
+                pixelOffsetX = 60;
+            }
+            if (d.pageY > containerHeight - containerHeight / 4) {
+                pixelOffsetY = 180;
+            } else {
+                pixelOffsetY = 60;
+            }
+
+
             svg.append('text')
                 .attr('id', "t" + id)
-                .attr('x', d.pageX - 60)
-                .attr('y', d.pageY - 60)
-                .text(i.city)
+                .attr('x', d.pageX - pixelOffsetX)
+                .attr('y', d.pageY - pixelOffsetY)
+                .text(`${i.city}`)
+            svg.append('text')
+                .attr('id', "t" + id + '1')
+                .attr('x', d.pageX - pixelOffsetX)
+                .attr('y', d.pageY - pixelOffsetY + pixelStep * 1)
+                .text(`Gemiddeld vermogen: ${i.GemiddeldVermogenPlaats}`)
+            svg.append('text')
+                .attr('id', "t" + id + '2')
+                .attr('x', d.pageX - pixelOffsetX)
+                .attr('y', d.pageY - pixelOffsetY + pixelStep * 2)
+                .text(`Gemiddelde uur prijs: ${i.gemiddeldeUurPrijs}`)
+            svg.append('text')
+                .attr('id', "t" + id + '3')
+                .attr('x', d.pageX - pixelOffsetX)
+                .attr('y', d.pageY - pixelOffsetY + pixelStep * 3)
+                .text(`gemiddelde groei per jaar: ${i.gemiddeldeGroeiPerJaar}`)
         }
 
         //mouseout event
@@ -228,6 +259,9 @@ export function createScatterPlot(array, x, y) {
             d3.select(this).transition().attr('r', circleRadius) //radius naar normaal
                 .attr('fill', 'white')
             d3.select("#t" + id).remove() //verwijder toegevoegd label
+            d3.select("#t" + id + '1').remove() //verwijder toegevoegd label
+            d3.select("#t" + id + '2').remove() //verwijder toegevoegd label
+            d3.select("#t" + id + '3').remove() //verwijder toegevoegd label
         }
     }
     renderBarChart(array)
