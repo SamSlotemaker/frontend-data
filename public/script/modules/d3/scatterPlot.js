@@ -29,6 +29,7 @@ const margin = {
 const pixelStep = "18"
 let pixelOffsetY;
 let pixelOffsetX;
+let maxDragDistance = 120;
 
 //bereken maximale lengtes van grafiek
 const innerWidth = width - margin.left - margin.right
@@ -59,16 +60,15 @@ export function createScatterPlot(array, x, y) {
             ])
             .on("zoom", zoomed)
         svg.call(zoom);
+
         //haal propertynames uit de data voor de filteropties
         let propertyNames = Object.getOwnPropertyNames(data[0])
         let propertyNamesWithoutCity = propertyNames.slice(1, 4)
         let yFields = propertyNamesWithoutCity
 
-
         //creeer groep voor grafiek
         const g = svg.append('g')
             .attr('transform', `translate(${margin.left}, ${margin.top})`)
-
         //title toevoegen
         g.append('text')
             .attr('y', -40)
@@ -87,10 +87,13 @@ export function createScatterPlot(array, x, y) {
         //roep 1 keer aan bij laden grafiek
         selectionChangedY()
 
+
+
+
         //initieren van de x- en yScale
         function setupScales() {
             xScale = d3.scaleLinear()
-                .domain(d3.extent(data, xValue))
+                .domain(d3.extent(data, xValue)) //extent retured array met berekende min en max
                 .range([0, innerWidth])
                 .nice()
 
@@ -99,20 +102,16 @@ export function createScatterPlot(array, x, y) {
                 .range([0, innerHeight])
                 .nice()
         }
-
         //initieren van de x- en yAxis
-
         function setupAxis() {
             xAxis = d3.axisBottom(xScale)
                 .tickSize(-innerHeight)
                 .tickPadding(15)
 
-            //creer as an zijkant
+            //creer axis
             yAxis = d3.axisLeft(yScale)
                 .tickSize(-innerWidth)
                 .tickPadding(15)
-
-            //voeg groep toe en creer xas label
             yAxisG = g.append('g')
 
             //toevoegen van label aan Y-as
@@ -140,14 +139,11 @@ export function createScatterPlot(array, x, y) {
                 .attr('class', 'axis-label')
                 .text(xVar)
         }
-
         //wordt aangeroepen wanneer select element veranderd
         function selectionChangedY() {
-            //this is the form element, zet naar standaard wanneer er geen change is uitgevoerd (eerste keer)
-
             //verwijder een bestaande error message
             d3.select('.error').remove()
-
+            //this is the form element, zet naar standaard wanneer er geen change is uitgevoerd (eerste keer)
             yVar = this ? this.value : yVar
             //geef een error message wanneer de gekozen Y-as gelijk is aan de X-as
             if (yVar == xVar) {
@@ -156,17 +152,17 @@ export function createScatterPlot(array, x, y) {
                     .classed('error', true)
                 return;
             }
+
             yScale.domain([d3.max(data, yValue), 0]) //nieuw domain maken
 
             //call nieuwe Y-as
             yAxisG.call(yAxis)
             yAxisG.selectAll('.domain').remove()
-
             //update y-as label
             yAxisG.select('text').text(yVar)
+
             //selecteer alle circles in parent element 'points_g'
             points = points_g.selectAll('circle').data(data)
-
             //update selection
             points.transition().attr('cy', d => yScale(yValue(d)))
 
@@ -178,7 +174,6 @@ export function createScatterPlot(array, x, y) {
                 .attr('cx', d => xScale(xValue(d))) //x attribute wordt geset voor ieter item
                 .attr('r', circleRadius) //circle radius
                 .attr('fill', 'white')
-
             //exit selection
             points.exit().remove()
         }
@@ -197,9 +192,10 @@ export function createScatterPlot(array, x, y) {
                 .text(d => "Y-as: " + d)
                 .property("selected", d => d === yVar)
         }
-
         //zoomed wordt uitgevoerd op het scrollevent
         function zoomed(e) {
+            //create max transform distance, snap back when dragged too far
+            checkMaxDragDistance(e)
             // create new scale ojects based on event
             var new_xScale = e.transform.rescaleX(xScale);
             var new_yScale = e.transform.rescaleY(yScale);
@@ -215,16 +211,26 @@ export function createScatterPlot(array, x, y) {
                 });
         }
 
+        //maximale drag distance waarna de grafiek terugschiet naar een begint punt
+        function checkMaxDragDistance(e) {
+            //enkel wanneer niet ingezoomd
+            if (e.transform.k == 1) {
+                if (e.transform.x > maxDragDistance) {
+                    e.transform.x = 20
+                }
+                if (e.transform.y < -maxDragDistance) {
+                    e.transform.y = -20
+                }
+            }
+        }
         //mouseover event
         function mouseOverEvent(d, i) {
             //verwijder alle niet letter en numerieke charachters als id's
             let city = i.city;
-            let id = city.replace(/[\W_]+/g, "");
-            //vergroot circle radius * 2
+            let id = city.replace(/[\W_]+/g, "")
+            //vergroot circle radius * 2 en kleur oranje
             d3.select(this).transition().attr('r', circleRadius * 2)
                 .attr('fill', 'orangered')
-            //voel label toe met id om later te verwijderen
-
             //verplaats hover informatie naar linksboven wanneer je je op de rand van de grafiek bevindt
             if (d.pageX > containerWidth - containerWidth / 4) {
                 pixelOffsetX = 260;
